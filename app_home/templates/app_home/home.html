@@ -1,0 +1,61 @@
+{# Homepage template - 3 parts : The SearchForm - Presentation (about) - Contact #}
+{% extends 'base.html' %}
+{% load static %}
+{% load dis_play %}
+
+{% block body_block %}
+<div class="my_body">
+    <div class="container">
+    {% include 'partials/_title.html' %}
+        {% if user.is_authenticated %}
+            <div class="msg-connect row align-items-center justify-content-center text-center col-12">
+                <h2>
+                    <strong>{% dis_play "app_user-home-text1" %} </strong>{{ user.get_username }}
+                </h2>
+            </div>
+            <div class=" row form-group align-items-center justify-content-center col-12 small mt-5">
+            <form method="post" action="#">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary small">{% dis_play "app_user-home-button1" %}</button>
+            </form>
+            </div>
+        {% else %}
+            <div class=" row form-group align-items-center justify-content-center col-12 small mt-5">
+                <form method="post" action="#">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <p class="error">
+                            <ul class="errorslist">
+                                {% for key, value in form.errors.items %}
+                                    <li>{% dis_play  value|get_error_msg %}</li>
+                                {% endfor %}
+                            </ul>
+                        </p>
+                    {% endif %}
+                    <p>
+                        {% dis_play "User" %} :<br>
+                        {{ form.username }}
+                    </p>
+                    <p>
+                        {% dis_play "Password" %} :<br>
+                        {{ form.password }} {{ form.bot_catcher }}<br />
+                        <a href="{% url 'app_user:reset_password' %}" class="small">{% dis_play "Pswforgotten" %}</a>
+                    </p>
+
+
+
+                    <button type="submit" class="btn btn-primary small">{% dis_play "app_user-home-button2" %}</button>
+                </form>
+            </div>
+        {% endif %}
+        <div class="col-12">
+            <div class="row align-items-center text-center mapsweather">
+                <div class="col-md-6 map d-none d-lg-block" id="map">
+                </div>
+                <div class="col-md-6 weather d-none d-lg-block" id="weather">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body_block %}

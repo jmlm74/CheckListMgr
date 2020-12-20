@@ -1,0 +1,22 @@
+{# main page with line and categories on the same page --> used only by the site Admin #}
+{% extends 'base.html' %}
+{% load static %}
+{% load dis_play %}
+{% block body_block %}
+<div class="my_body" id="catandlinemgmt">
+    {% include "partials/_modal.html" %}
+
+    <div class="container">
+        {% include 'partials/_title.html' %}
+        {% include "app_create_chklst/partials/_categorytable.html" %}
+        <hr class="bold-hr" />
+        {% include "app_create_chklst/partials/_linetable.html" %}
+        {% include 'partials/_back.html' %}
+    </div>
+</div>
+<script>
+const formURL = "{%  url 'app_create_chklst:chk-catcreate' %}"
+const formURL2 = "{%  url 'app_create_chklst:chk-linecreate' %}"
+const returnURL = "{% url 'app_create_chklst:catlineMgmt' %}"
+</script>
+{% endblock body_block %}

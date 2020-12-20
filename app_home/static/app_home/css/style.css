@@ -1,0 +1,25 @@
+.weather,.map{
+    width: 100%;
+	height: 350px;
+    margin: 0px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid black;
+}
+
+.weather{
+    background-color: paleturquoise;
+}
+
+.msg-connect{
+    margin-top: 5%;
+}
+
+textarea.legal{
+  width:100%;
+  height: 15em;
+}
+
+.legal-nav{
+  color: dodgerblue; !important;
+}

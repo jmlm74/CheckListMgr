@@ -1,0 +1,10 @@
+{
+	"version": 3,
+	"file": "style-clm.css",
+	"sources": [
+		"style-clm.scss",
+		"../../app_home/static/app_home/css/_style-clm.scss"
+	],
+	"names": [],
+	"mappings": "ACAA,AAAA,eAAe,CAAA;EAAC,KAAK,EAAE,IAAI,GAAG;;ADG9B,AAAA,UAAU,CAAA;EACN,gBAAgB,EAAE,GAAG,GACxB"
+}

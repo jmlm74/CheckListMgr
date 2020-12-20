@@ -1,0 +1,128 @@
+{# main page  #}
+{% extends 'base.html' %}
+{% load static %}
+{% load dis_play %}
+{% block body_block %}
+<div class="container">
+    <div class="my_body" id="main">
+        {% include 'partials/_title.html' %}
+        <div class="row buttons col-12 mt-5 mb-5 align-items-center">
+            <div class=" col-md-3 col-xl-2 d-none d-md-block">
+                <a href="{% url 'app_user:list' %}">
+                    <button type="button" class="btn btn-primary btn-block">
+                        <i class="fas fa-3x fa-user"></i><br />
+                        {% dis_play "Users" %}
+                    </button>
+                </a>
+            </div>
+            {% if user.is_superuser %}
+                <div class="col-md-3 col-xl-2 d-none d-md-block">
+                    <a href="{% url 'app_user:listcompanies' %}">
+                        <button type="button" class="btn btn-primary btn-block">
+                            <i class="fas fa-3x fa-building"></i><br />
+                            {% dis_play "Companies" %}
+                        </button>
+                    </a>
+                </div>
+            {% endif %}
+            {% if user.admin or not user.pro%}
+            <div class="col-md-3 col-xl-2  d-none d-md-block">
+                <a href="{% url 'app_create_chklst:chk-main' %}">
+                    <button type="button" class="btn btn-primary btn-block">
+                        <i class="fas fa-3x fa-tasks"></i><br />
+                        {% dis_play "Checklists" %}
+                    </button>
+                </a>
+            </div>
+            {% endif %}
+            {% if user.pro %}
+            <div class="col-md-3 col-xl-2 d-none d-md-block">
+                <a href="{% url 'app_input_chklst:inp-main' %}">
+                    <button type="button" class="btn btn-primary btn-block">
+                        <i class="fas fa-3x fa-cogs"></i><br />
+                        {% dis_play "Materials" %}
+                    </button>
+                </a>
+            </div>
+            {% else %}
+                <div class="offset-md-2 col-md-2 offset-xl-4 col-xl-2 d-none d-md-block">
+                {% if user.first_login %}
+                        <h5 class="blinking alert-info"> 1st login --> </h5>
+                {% endif %}
+                </div>
+                    <div class="col-md-2 col-xl-2 d-none d-md-block">
+                        <a href="{% get_media_prefix %}tuto/tutorial.pdf" target="_blank">
+                            <button type="button" class="btn btn-info btn-block">
+                                <i class="fas fa-3x fa-question"></i><br />
+                                {% dis_play "Tutorial" %}
+                            </button>
+                        </a>
+                    </div>
+            {% endif %}
+        </div>
+        {% include "app_home/partials/_checkliststable.html" %}
+        <hr class="bold-hr mt-3" />
+        <div class="row mt-2">
+
+            <form id="form-search">
+                {% csrf_token %}
+                <div class="col-12">
+                {% if user.pro %}
+                    <span class="col-12 col-md-4">
+                        <label for="smaterial">Material</label>
+                        <select name="smaterial" id="search-material" style="max-width: 10em;" ></select>
+                    </span>
+                     <span class="col-12 col-md-4">
+                        <label for="smanager">Manager</label>
+                         <select name="smanager" id="search-manager" style="max-width: 10em;"></select>
+                    </span>
+                {% endif %}
+                <span class="col-12 col-md-3">
+                    <label for="sdate">Date</label>
+                    <input type="text" name="sdate" id="search-date" size="10" maxlength="10" placeholder="yyyy-mm-dd">
+                </span>
+                <span class=" col-12 col-md-1 mt-2">
+                    <button type="submit" class="btn btn-primary" id="search-button">search</button>
+                </span>
+                </div>
+            </form>
+
+        </div>
+        <hr class="bold-hr mt-3" />
+        <div class="row mt-2">
+            <div class="col-12 text-center" id="test-scss-main">
+                <h3>{% dis_play "Lastchecklists" %}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <ul id="ul-chklsts">
+                    {% for checklistok in checklistsdone %}
+                        {% if checklistok.cld_valid %}
+                            <li class="mt-1 text-success">
+                        {% else %}
+                            <li class="mt-1 text-danger">
+                        {% endif %}
+                        <a href="{{ checklistok.cld_pdf_file.url }}" target="_blank" style="color:inherit;">
+                        {% if user.is_superuser %}
+                            {{checklistok.cld_company.company_name}} -
+                        {% endif %}
+                        {% if user.pro %}
+                            {% if checklistok.cld_man %}
+                                {{checklistok.cld_man}} -
+                            {% endif %}
+                            {% if checklistok.cld_mat %}
+                                {{checklistok.cld_mat}} -
+                            {% endif %}
+                        {% endif %}
+                            {{ checklistok.cld_key }}</a> - {{ checklistok.modified_date|date:"d/m/Y" }}
+                            - {{ checklistok.cld_checklist.chk_title|truncatewords:3 }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% include 'partials/_back.html' %}
+    </div>
+</div>
+{% endblock body_block %}

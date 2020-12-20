@@ -1,0 +1,65 @@
+{# Template for manager --> input2  #}
+{% extends 'base.html' %}
+{% load static %}
+{% load dis_play %}
+{% block body_block %}
+{% load crispy_forms_tags %}
+<div class="container" id="checklist_man">
+{% include "partials/_modal.html" %}
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75"
+             aria-valuemin="0" aria-valuemax="100"style="width: 50%;"></div>
+    </div>
+    <div class="my_body" id="main">
+        {% include 'partials/_title.html' %}
+        <form method="post" action="">
+            {% csrf_token %}
+
+            <div class="form-group">
+                {% dis_play "Manager" %}* :
+                <select name="manager" id="man_select">
+                    <option value="0">--------</option>
+                    {% for man in managers %}
+                        <option value="{{ man.id }}">{{ man.mgr_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <p class="form-group">
+                {% dis_play "Contactname" %} :
+                {{ form.mgr_contact }}
+            </p>
+            <div class="form-group">
+                {% dis_play "Phone" %} : {{ form.mgr_phone }}
+            </div>
+            <div class="form-group">
+                {% dis_play "Email1" %} : {{ form.mgr_email1 }}
+            </div>
+            <div class="form-group">
+                {% dis_play "Email2" %} : {{ form.mgr_email2 }}
+                {{ form.mgr_id.as_hidden }}
+            </div>
+            <div class="row col-12">
+                <div class="col-4 col-md-3 mb-3">
+                    <input type="submit" class="btn btn-primary" name="previous" value="{% dis_play "Previous" %}"/>
+                </div>
+                <div class="col-3 col-md-3 mb-3">
+                    <input type="submit" class="btn btn-primary" value="{% dis_play "Next" %}"/>
+                </div>
+                <div class="col-5 col-md-6 mb-3 text-center">
+                    <button id="create-mgr" class="btn btn-primary" type="button" name="button">
+                        <i class="fa fa-plus mr-2"></i>{% dis_play "Create" %}
+                    </button>
+                </div>
+            </div>
+ </form>
+    </div>
+{% include 'partials/_back.html' %}
+</div>
+    <script>
+let formURL = "{%  url 'app_input_chklst:inp-mgrcreate' %}".concat('',"?url=").concat('',"{{ url }}")
+// formURL = formURL.concat('',"{{ url }}")
+// console.log(formURL)
+const formURL2 = "{%  url 'app_create_chklst:chk-main' %}"
+</script>
+{% endblock %}
