@@ -23,6 +23,9 @@ before install:
    # - geckodriver --version
    # - export MOZ_HEADLESS=1
 
+services:
+   - postgresql
+
 before_script:
    - pip install -r requirements.txt
    - psql -c 'create database testdb;' -U postgres
