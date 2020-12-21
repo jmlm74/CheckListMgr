@@ -1,6 +1,13 @@
 language: python
 python: '3.9'
 
+addons:
+  postgresql: "12"
+  apt:
+    packages:
+    - postgresql-12
+    - postgresql-client-12
+
 branches:
    only:
       - CI
@@ -25,10 +32,6 @@ env:
   global:
     - DJANGO_SETTINGS_MODULE="checklistmgr.travis_settings"
     - MOZ_HEADLESS=1
-
-
-services:
-        - postgresql : "12"
 
 script:
    - python3 manage.py test
