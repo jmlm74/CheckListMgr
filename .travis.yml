@@ -29,7 +29,6 @@ services:
 before_script:
    - pip install -r requirements.txt
    - psql -c 'create database testdb;' -U postgres
-   - cd checklistmgr
 
 env:
   global:
