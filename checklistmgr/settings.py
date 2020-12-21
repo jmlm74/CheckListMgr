@@ -69,6 +69,8 @@ INSTALLED_APPS = [
     'app_checklist.apps.AppChecklistConfig',
 
     'sass_processor',
+    'compressor',
+
 ]
 
 MIDDLEWARE = [
@@ -195,7 +197,12 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'sass_processor.finders.CssFinder',
+    'compressor.finders.CompressorFinder',
 ]
 
 # Django Sass
-SASS_PROCESSOR_ROOT = os.path.join(BASE_DIR,'static')
+SASS_PROCESSOR_ROOT = os.path.join(BASE_DIR, 'static')
+
+# compressor
+COMPRESS_PRECOMPILERS = (('text/x-scss', 'django_libsass.SassCompiler'),)
+COMPRESS_ROOT = STATIC_DIR

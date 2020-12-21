@@ -55,3 +55,5 @@ LOGGING = {
     },
 }
 
+if PRODUCTION:
+    COMPRESS_ROOT = STATIC_ROOT

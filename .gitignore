@@ -9,6 +9,7 @@ api_key.txt
 staticfiles
 media
 workspace.code-workspace
+static/CACHE/
 
 # Django stuff:
 *.log

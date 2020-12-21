@@ -7,6 +7,7 @@
 {% load static %}
 {% load dis_play %}
 {% load sass_tags %}
+{% load compress %}
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -29,9 +30,9 @@
         <!-- Bootstrap toggle checkbox -->
         <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
         <!-- Third party plugin CSS-->
-
-        <link href="{% sass_src 'css/style-clm.scss' %}" rel="stylesheet" type="text/css" />
-
+        {% compress css %}
+        <link href="{% sass_src 'css/style-clm.scss' %}" rel="stylesheet" type="text/x-scss" />
+        {% endcompress %}
         <!--
         <link href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" rel="stylesheet" />
         -->
