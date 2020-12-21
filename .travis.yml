@@ -1,12 +1,12 @@
 language: python
 python: '3.9'
 
-addons:
-  postgresql: "12"
-  apt:
-    packages:
-    - postgresql-12
-    - postgresql-client-12
+# addons:
+#  postgresql: "12"
+#  apt:
+#    packages:
+#    - postgresql-12
+#    - postgresql-client-12
 
 branches:
    only:
@@ -23,8 +23,8 @@ before install:
    # - geckodriver --version
    # - export MOZ_HEADLESS=1
 
-services:
-   - postgresql
+# services:
+#    - postgresql
 
 before_script:
    - pip install -r requirements.txt
