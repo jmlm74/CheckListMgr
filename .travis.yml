@@ -23,8 +23,8 @@ before install:
    # - geckodriver --version
    # - export MOZ_HEADLESS=1
 
-# services:
-#    - postgresql
+services:
+   - postgresql
 
 before_script:
    - pip install -r requirements.txt
