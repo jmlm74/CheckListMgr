@@ -1,16 +1,3 @@
-
-@import "../../app_home/static/app_home/css/style-clm.scss";
-@import "../../app_checklist/static/app_checklist/css/style-clm.scss";
-@import "../../app_create_chklst/static/app_create_chklst/css/style-clm.scss";
-@import "../../app_input_chklst/static/app_input_chklst/css/style-clm.scss";
-@import "../../app_user/static/app_user/css/style-clm.scss";
-
-$orang-jm: #b23d24;
-
-#test-scss{
-    background-color: $orang-jm;
-}
-
 body{
     font-family: "Roboto", "Open Sans", "Lato", "Source Pro", sans-serif;
 }

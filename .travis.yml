@@ -1,12 +1,12 @@
 language: python
 python: '3.9'
 
-# addons:
-#  postgresql: "12"
-#  apt:
-#    packages:
-#    - postgresql-12
-#    - postgresql-client-12
+ addons:
+  postgresql: "12"
+  apt:
+    packages:
+    - postgresql-12
+    - postgresql-client-12
 
 branches:
    only:
@@ -22,6 +22,14 @@ before install:
    # - export PATH=$PATH:$PWD/geckodriver
    # - geckodriver --version
    # - export MOZ_HEADLESS=1
+   # - sudo apt-get update
+   # - sudo apt-get --yes purge  postgresql\*
+   # - sudo apt-get install -y postgresql-12 postgresql-client-12
+   # - sudo /etc/init.d/postgresql restart
+   - sudo pg_dropcluster --stop 12 main
+   - sudo pg_upgradecluster 11 main
+   - sudo pg_ctlcluster 12 main restart
+   - sudo pg_dropcluster 11 main
 
 services:
    - postgresql
