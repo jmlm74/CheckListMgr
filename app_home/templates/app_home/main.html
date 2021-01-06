@@ -116,7 +116,7 @@
                             {% endif %}
                         {% endif %}
                             {{ checklistok.cld_key }}</a> - {{ checklistok.modified_date|date:"d/m/Y" }}
-                            - {{ checklistok.cld_checklist.chk_title|truncatewords:3 }}
+                            - {{ checklistok.cld_title|truncatewords:3 }}
                         </li>
                     {% endfor %}
                 </ul>

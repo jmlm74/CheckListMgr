@@ -107,6 +107,7 @@ def before_preview(request):
     newchecklist.cld_user = request.user
     newchecklist.cld_company = request.user.user_company
     newchecklist.cld_checklist = checklist
+    newchecklist.cld_title = checklist.chk_title
     if request.session['mat']['id'] != '0':
         newchecklist.cld_material = Material.objects.get(pk=request.session['mat']['id'])
         newchecklist.cld_mat = newchecklist.cld_material.mat_designation

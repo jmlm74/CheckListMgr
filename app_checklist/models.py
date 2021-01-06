@@ -26,6 +26,7 @@ class CheckListDone(models.Model):
                                     null=True)
     cld_mat = models.CharField(max_length=30, verbose_name="Material", null=True)
     cld_man = models.CharField(max_length=30, verbose_name="Manager", null=True)
+    cld_title = models.CharField(max_length=80, verbose_name="title", default="XXX")
     cld_valid = models.BooleanField(default=False, verbose_name="Valid")
     cld_remarks = models.TextField(verbose_name="Remarks", null=True)
 

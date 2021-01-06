@@ -108,7 +108,8 @@ class MainView(SortableListView):
         if self.request.user.is_superuser:
             return CheckList.objects.all().order_by(order)
         else:
-            return CheckList.objects.filter(Q(chk_company=self.request.user.user_company)).order_by(order)
+            return CheckList.objects.filter(Q(chk_company=self.request.user.user_company) |
+                                            Q(chk_company=999999) & Q(chk_enable=True)).order_by(order)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -167,17 +168,17 @@ def search_chklst(request):
             query &= Q(cld_manager_id=request_data['manager'])
         if 'date' in request_data:
             query &= Q(modified_date__icontains=request_data['date'])
-        print(query)
+        # print(query)
         checklists_done = CheckListDone.objects.filter(query).order_by('-modified_date')[:20]
-        print(checklists_done)
+        # print(checklists_done)
         data = []
         for idx, chklst in enumerate(checklists_done):
-            print(chklst)
+            # print(chklst)
             data.append({'key': chklst.cld_key,
                          'valid': chklst.cld_valid,
                          'pdf': chklst.cld_pdf_file.url,
                          'date': str(chklst.modified_date)[:10],
-                         'title': chklst.cld_checklist.chk_title[:30],
+                         'title': chklst.cld_title[:30],
                          })
             try:
                 data[idx]['manager'] = chklst.cld_manager.mgr_name

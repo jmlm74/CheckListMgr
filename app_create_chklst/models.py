@@ -146,6 +146,12 @@ class CheckList(models.Model):
         liste2 = sorted(liste, key=lambda mydic: mydic['pos'])
         return liste2
 
+    def delete(self):
+        company = Company.objects.get(pk=1000000)
+        self.chk_company = company
+        self.save()
+        return True
+
 
 class CheckListCategory(models.Model):
     """

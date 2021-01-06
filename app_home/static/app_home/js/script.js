@@ -128,7 +128,13 @@ if (document.querySelector("#lega")){  // legal page
         textElt.setSelectionRange(0, 0)
     }
 }
+/*********************/
+/* end of legal page */
+/*********************/
 
+/************************************/
+/* The last checklist search search */
+/************************************/
 if (document.querySelector("#form-search")) {
     const csrfToken = getCookie('csrftoken');
     const search_mat = document.getElementById('search-material');
