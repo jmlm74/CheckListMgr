@@ -1,4 +1,4 @@
-from bootstrap_modal_forms.forms import BSModalModelForm
+from bootstrap_modal_forms.forms import BSModalModelForm, BSModalForm
 from django import forms
 
 from app_create_chklst.models import Category, Line, CheckList
@@ -63,3 +63,27 @@ class CheckListCreateForm(forms.Form):
     class Meta:
         model = CheckList
         Fields = ['chk_key', 'chk_title', 'chk_enable', 'chk_company', ]
+
+
+class CheckListCopyForm(BSModalForm):
+    """
+    CheckList copy form --> BSmodal
+    Clean method is used to validate the checklist_name (no duplicate)
+    """
+    chk_newkey = forms.CharField(max_length=80, widget=forms.TextInput(attrs={'size': '30'}))
+    chk_newtitle = forms.CharField(max_length=80, widget=forms.TextInput(attrs={'size': '80'}))
+
+    class Meta:
+        fields = ['chk_newname']
+
+    def clean(self):
+        super(CheckListCopyForm, self).clean()
+        if 'submit-btn' in self.data:
+            new_key = self.cleaned_data.get('chk_newkey')
+            key_count = CheckList.objects.filter(chk_key=new_key).count()
+            if key_count > 0:
+                raise forms.ValidationError('Duplicate_key')
+        else:
+            raise forms.ValidationError('Operation_canceled')
+        return self.cleaned_data
+

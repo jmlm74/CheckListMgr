@@ -1,0 +1,28 @@
+{% load dis_play %}
+{% load widget_tweaks %}
+<form method="post" action="">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h3>{% dis_play "Copychklst" %}</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        {# <strong>{% dis_play "Key"%} : <br />{{ checklist.chk_key }}</strong> #}
+        <div class="form-group">
+            <label for="key">{% dis_play "Key"%} : <br /></label>
+            {% render_field form.chk_newkey class="form-control" value=checklist.chk_key %}
+        </div>
+        <div class="form-group">
+            <label for="title">{% dis_play "Wording"%} : <br /></label>
+            {% render_field form.chk_newtitle class="form-control" value=checklist.chk_title %}
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" name="submit-btn" id="submit-btn" class="btn btn-primary">{% dis_play "Copy" %}</button>
+        <button type="submit" name="cancel-btn" id="cancel-btn" class="btn btn-danger">{% dis_play "Cancel" %}</button>
+    </div>
+</form>

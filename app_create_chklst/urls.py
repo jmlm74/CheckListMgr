@@ -31,6 +31,8 @@ urlpatterns = [
     path('chklstdelete/<int:pk>', login_required(accclv.ChklstDeleteView.as_view()), name='chk-chkdelete'),
     path('chklstdisplay/<int:pk>', login_required(accclv.ChklstDisplayView.as_view()), name='chk-chkdisplay'),
     path('chklstupdate/<int:pk>', login_required(accclv.ChkLstUpdateView.as_view()), name='chk-chkupdate'),
+    path('chklstcopy/<int:pk>', login_required(accclv.ChkLstCopyView.as_view()), name='chk-chkcopy'),
+    path('chklstcopy/', login_required(accclv.ChkLstCopyView.as_view()), name='chk-chkcopy'),
 
     # Ajax create chklst
     path('create_chklst/', login_required(accclv.create_chklst), name='create_chklst'),

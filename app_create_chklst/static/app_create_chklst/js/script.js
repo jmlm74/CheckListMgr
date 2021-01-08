@@ -130,6 +130,7 @@ if ((document.getElementById('catandlinemgmt')) || (document.getElementById('mai
             formURL: formURL2,
             modalID: "#create-modal"
         });
+
         var asyncSuccessMessage = [
             "<div ",
             "style='position:fixed;top:0;z-index:10000;width:100%;border-radius:0;' ",
@@ -171,14 +172,15 @@ if ((document.getElementById('catandlinemgmt')) || (document.getElementById('mai
                     formURL: $(this).data("form-url"),
                     modalID: "#modal"
                 });
+            console.log(`formUrl = ${formURL}`)
         });
 
         // Hide message
         $(".alert").fadeTo(2000, 500).slideUp(500, function () {
             $(".alert").slideUp(500);
         });
-
     });
+
 }
 /* ********************* */
 /* * Beginning end box * */

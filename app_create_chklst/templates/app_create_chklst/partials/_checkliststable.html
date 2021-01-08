@@ -60,8 +60,8 @@
                                     <span data-tooltip="{%  dis_play "Update" %}">
                                         <a href="{% url 'app_create_chklst:chk-chkupdate' checklist.pk %}" ><i class="tabicon fas fa-edit mr-2" style="color: dodgerblue;"></i></a>
                                     </span>
-                                    <span data-tooltip="{%  dis_play "copy" %}">
-                                        <span href="{% url 'app_create_chklst:chk-chkdelete' checklist.pk %}" ><i class="tabicon far fa-copy" style="color: black; !important"></i></span>
+                                    <span data-tooltip="{%  dis_play "Copy" %}">
+                                        <span class="bs-modal" data-form-url="{% url 'app_create_chklst:chk-chkcopy' checklist.pk %}" ><i class="tabicon far fa-copy mr-2" style="color: black; !important"></i></span>
                                     </span>
                                     <span data-tooltip="{%  dis_play "Delete" %}">
                                         <span class="bs-modal" data-form-url="{% url 'app_create_chklst:chk-chkdelete' checklist.pk %}" ><i class="tabicon fas fa-trash-alt" style="color: red; !important"></i></span>

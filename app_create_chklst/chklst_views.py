@@ -1,17 +1,17 @@
 import json
 
 from sortable_listview import SortableListView
-from bootstrap_modal_forms.generic import BSModalDeleteView, BSModalReadView
+from bootstrap_modal_forms.generic import BSModalDeleteView, BSModalReadView, BSModalFormView
 
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic.base import View
 
-from app_create_chklst.forms import CheckListCreateForm
+from app_create_chklst.forms import CheckListCreateForm, CheckListCopyForm
 from app_create_chklst.models import (Category,
                                       CheckListLine,
                                       CheckListCategory,
@@ -60,6 +60,7 @@ def create_chklst(request):
     """
     Create checklist --> Ajax request
     if POST (GET method bot treated)
+        --> call create_chklst function --> reusable
         --> get the data from the request (JSON format)
         --> if Checklist already exists --> update - otherwise --> insert
         --> lines (blank array if no lines) --> cat & lines
@@ -74,59 +75,72 @@ def create_chklst(request):
     if request.method == 'POST':
         data = {'data': 'ERROR'}
         request_data = json.loads(request.read().decode('utf-8'))
-        # print(request.headers)
-        # print(request_data)
-        chk_key = request_data['chk_key']
-        chk_title = request_data['chk_title']
-        chk_enable = request_data['chk_enable']
-        if 'chk_company' in request_data:
-            chk_company = Company.objects.get(pk=request_data['chk_company'])
-        else:
-            chk_company = request.user.user_company
+        data = create_chklst_fct(request, request_data)
+    return JsonResponse(data)
 
-        lines = request_data['lines']
-        position = 0
-        if CheckList.objects.filter(Q(chk_key=chk_key) & Q(chk_company=chk_company)).exists():
-            CheckList.objects.filter(Q(chk_key=chk_key) & Q(chk_company=chk_company))\
-                .update(chk_title=chk_title,
-                        chk_enable=chk_enable,
-                        chk_company=chk_company,
-                        chk_user_id=request.user.id)
+
+@transaction.atomic
+def create_chklst_fct(request, request_data):
+    """
+    cf create_chklst
+    """
+    chk_key = request_data['chk_key']
+    chk_title = request_data['chk_title']
+    chk_enable = request_data['chk_enable']
+    if 'chk_company' in request_data:
+        chk_company = Company.objects.get(pk=request_data['chk_company'])
+    else:
+        chk_company = request.user.user_company
+
+    lines = request_data['lines']
+    position = 0
+    if CheckList.objects.filter(Q(chk_key=chk_key) & Q(chk_company=chk_company)).exists():
+        if request_data['action'] == 'create':
+            data = {'data': 'Erreur'}
+            messages.error(request, "Duplchkkey")
+            return data
+        CheckList.objects.filter(Q(chk_key=chk_key) & Q(chk_company=chk_company))\
+            .update(chk_title=chk_title,
+                    chk_enable=chk_enable,
+                    chk_company=chk_company,
+                    chk_user_id=request.user.id)
+    else:
+        CheckList.objects.create(chk_key=chk_key,
+                                 chk_title=chk_title,
+                                 chk_enable=chk_enable,
+                                 chk_company=chk_company,
+                                 chk_user_id=request.user.id)
+    new_checklist = CheckList.objects.get(Q(chk_key=chk_key) & Q(chk_company=chk_company))
+    CheckListLine.objects.filter(chk_line_checklist=new_checklist).delete()
+    CheckListCategory.objects.filter(chk_cat_checklist=new_checklist).delete()
+    for line in lines:
+        cat_line = line[0:3]
+        catline_id = line[4:]
+        print(f"{line} - {cat_line} - {catline_id}")
+        if cat_line == "cat":
+            category = Category.objects.get(pk=int(catline_id))
+            chkcat, created = CheckListCategory.objects.update_or_create(chk_cat_position=position,
+                                                                         chk_cat_category=category,
+                                                                         chk_cat_checklist=new_checklist)
+            chkcat.save()
         else:
-            CheckList.objects.create(chk_key=chk_key,
-                                     chk_title=chk_title,
-                                     chk_enable=chk_enable,
-                                     chk_company=chk_company,
-                                     chk_user_id=request.user.id)
-        new_checklist = CheckList.objects.get(Q(chk_key=chk_key) & Q(chk_company=chk_company))
-        CheckListLine.objects.filter(chk_line_checklist=new_checklist).delete()
-        CheckListCategory.objects.filter(chk_cat_checklist=new_checklist).delete()
-        for line in lines:
-            cat_line = line[0:3]
-            catline_id = line[4:]
-            if cat_line == "cat":
-                category = Category.objects.get(pk=int(catline_id))
-                chkcat, created = CheckListCategory.objects.update_or_create(chk_cat_position=position,
-                                                                             chk_cat_category=category,
-                                                                             chk_cat_checklist=new_checklist)
-                chkcat.save()
-            else:
-                line = Line.objects.get(pk=int(catline_id))
-                chkline, created = CheckListLine.objects.update_or_create(chk_line_position=position,
-                                                                          chk_line_line=line,
-                                                                          chk_line_checklist=new_checklist)
-                chkline.save()
-            position += 1
+            line = Line.objects.get(pk=int(catline_id))
+            chkline, created = CheckListLine.objects.update_or_create(chk_line_position=position,
+                                                                      chk_line_line=line,
+                                                                      chk_line_checklist=new_checklist)
+            chkline.save()
+        position += 1
     data = {'data': 'OK'}
     try:
         if request_data['action'] == 'create':
             messages.success(request, "CreatechklstOK")
-        else:
+        elif request_data['action'] == 'update':
             messages.success(request, "UpdatechklstOK")
+        else:
+            messages.success(request, "CopychklstOK")
     except KeyError:
         pass
-    return JsonResponse(data)
-
+    return data
 
 # noinspection PyTypeChecker
 class ChkLstCreateView(View):
@@ -224,3 +238,53 @@ class MainChkLstView(SortableListView):
         context['sort'] = self.request.GET.get('sort', 'chk_key')
         context['title'] = 'Checklists'
         return context
+
+
+class ChkLstCopyView(BSModalFormView):
+    """
+    Checklist copy view BS Modal Form --> generic view
+    - get_context_data
+        --> to get the source checklist and pass in context to display old fields in form inputs
+    - POST
+        --> valid the form -−> not valid --> exit with message (redirect to main)
+            --> valid --> get the new key & title + get all the details of the source
+                      --> call the create_checklist with all the datas
+                      --> redirect to main
+    """
+    context = {'title': 'Chklistcopy'}
+    template_name = 'app_create_chklst/dialogboxes/copychklst.html'
+    form_class = CheckListCopyForm
+    success_url = reverse_lazy('app_create_chklst:chk-main')
+    success_message = 'LineCreateOK'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        old_id = int(self.kwargs['pk'])
+        old_checklist = CheckList.objects.get(pk=old_id)
+        context['checklist'] = old_checklist
+        return context
+
+    def post(self, request, *args, **kwargs):
+        print('POST')
+        copy_form = CheckListCopyForm(request.POST)
+        if 'cancel-btn' in request.POST:
+            print("Cancel")
+            messages.error(request, "Canceled")
+            return redirect(self.success_url)
+        if copy_form.is_valid():
+            old_id = kwargs['pk']
+            old_checklist = CheckList.objects.get(pk=old_id)
+            details = old_checklist.chklst_detail()
+            lines = []
+            for detail in details:
+                line = f"{detail['line_cat'][0:3]}-{detail['id']}"
+                lines.append(line)
+            data = {'action': 'copy',
+                    'chk_key': copy_form.cleaned_data['chk_newkey'],
+                    'chk_title': copy_form.cleaned_data['chk_newtitle'],
+                    'chk_enable': old_checklist.chk_enable,
+                    'lines': lines}
+            new_data = create_chklst_fct(request, data)
+        else:
+            messages.error(request, "Duplchkkey")
+        return redirect(self.success_url)

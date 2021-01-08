@@ -1,8 +1,9 @@
+import uuid
+
 from django.db import models
 from django.db.models import UniqueConstraint
 
 from app_user.models import User, Company
-from app_utilities.models import Translation
 
 
 """
@@ -147,8 +148,14 @@ class CheckList(models.Model):
         return liste2
 
     def delete(self):
+        """
+        Don't delete a checklist and Don't change id --> link with checklistdone !
+        set company to dummy company (visible only by site admin)
+        rename key with uuid to avoid duplicate (same company !)
+        """
         company = Company.objects.get(pk=1000000)
         self.chk_company = company
+        self.chk_key = self.chk_key[0:20] + "-" + str(uuid.uuid4().hex)[:8]
         self.save()
         return True
 

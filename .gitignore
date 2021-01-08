@@ -35,4 +35,5 @@ celerybeat.pid
 
 .coverage
 .coverage.*
+CACHE/
 
