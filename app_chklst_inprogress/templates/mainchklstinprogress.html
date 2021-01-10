@@ -25,7 +25,7 @@
                 </button>
                 </a>
             </div>
-            {% if user.is_superuser %}
+            {% if user.is_superadmin %}
             <div class="col-sm-2 col-12">
                 <a href="{% url 'app_create_chklst:catlineMgmt' %}">
                 <button type="button" class="btn btn-primary btn-block">

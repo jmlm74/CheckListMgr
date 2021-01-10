@@ -2,6 +2,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load dis_play %}
+{% load render_table from django_tables2 %}
 {% block body_block %}
 <div class="container">
     <div class="my_body" id="main">
@@ -67,7 +68,9 @@
                     </div>
             {% endif %}
         </div>
-        {% include "app_home/partials/_checkliststable.html" %}
+        {% include "app_home/partials/_newchecklisttable.html" %}
+        <hr class="bold-hr" />
+        {% include "app_home/partials/_newchecklistinprotable.html" %}
         <hr class="bold-hr mt-3" />
         <div class="row mt-2">
 

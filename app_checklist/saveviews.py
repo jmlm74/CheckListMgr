@@ -55,6 +55,10 @@ class ChekListInput4(View):
                 request.session['chksave']['cld_valid'] = request.POST.get('cld_valid', False)
                 request.session['chksave']['cld_remarks'] = request.POST.get('cld_remarks', '')
                 return redirect('app_checklist:saisie3')
+            elif 'keep' in request.POST:
+                new_checklist.cld_status = 3
+                new_checklist.save()
+                return redirect('app_checklist:pdf', save='3')
             else:
                 new_checklist.cld_status = 1
                 new_checklist.save()

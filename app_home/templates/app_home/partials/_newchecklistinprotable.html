@@ -1,0 +1,38 @@
+{% load dis_play %}
+<div class="row mt-3">
+    <div class="col-4 col-md-3">
+        <h3 class="text-warning">{% dis_play "Checklistsinpro" %}</h3>
+    </div>
+
+    <div class="row align-items-top justify-content-center text-center col-12 small">
+        {% include 'partials/_errormessage.html' %}
+        <table id="cat_table" class="table">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 5em;" scope="col">#</th>
+                    <th class="text-center" style="width: 20em;" scope="col">{% dis_play "Key" %}</th>
+                    <th class="text-center" style="width: 20em;" scope="col">{%  dis_play "Wording" %}</th>
+                    <th class="text-center" style="width: 10em;" scope="col">{%  dis_play "Date" %}</th>
+                    <th class="text-center" style="width: 10em;" scope="col">{%  dis_play "User" %}</th>
+                    {% if user.is_superuser %}
+                        <th class="text-center" style="width: 5em;" scope="col">{% dis_play "Company" %}</th>
+                    {% endif %}
+                    <th class="text-center" style="width: 10em;" scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for chklstinpro in clpro_users %}
+                <tr>
+                    <th class="text-center" scope="row">{{ forloop.counter }}</th>
+                    <td class="text-center">{{ chklstinpro.cld_key }}</td>
+                    <td class="text-center">{{ chklstinpro.cld_key }}</td>
+                    <td class="text-center">{{ chklstinpro.modified_date }}</td>
+                    <td class="text-center">{{ chklstinpro.cld_user.username }}</td>
+                    {% if user.is_superuser %}<td class="text-center">{{ chklstinpro.cld_company.company_name }}</td>{% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% include 'app_home/partials/_chklstpaginator.html' with page_obj=clpro_users %}
+    </div>
+</div>

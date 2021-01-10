@@ -2,14 +2,18 @@ import json
 
 from django.contrib.auth import authenticate, login
 from django.core import serializers
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, reverse
 from django.views import View
 from django.views.generic.base import TemplateView
+from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django_tables2 import MultiTableMixin, tables, RequestConfig
 
 from sortable_listview import SortableListView
+
 
 from app_checklist.models import CheckListDone
 from app_create_chklst.models import CheckList
@@ -192,3 +196,84 @@ def search_chklst(request):
                 data[idx]['company'] = chklst.cld_company.company_name
         data = json.dumps(data)
     return HttpResponse(data)
+
+
+class ChecklistTable(tables.Table):
+    class Meta:
+        model = CheckList
+        fields = ('chk_key', 'chk_title', 'chk_company.company_name')
+
+
+
+class ChecklistdoneTable(tables.Table):
+    class Meta:
+        model = CheckListDone
+
+def new_main_view(request):
+
+    context = {'title': "Main"}
+    if request.method == 'POST':
+        return render(request, "app_home/newmain.html", context=context)
+    if request.method == 'GET':
+        list(messages.get_messages(request))
+        # get Check-lists & Check-lists done
+        if request.user.is_superuser:
+            """
+            checklists = ChecklistTable(CheckList.objects.all())
+            checklistsinpro = ChecklistdoneTable(CheckListDone.objects.filter(cld_status=3).order_by('-modified_date'))
+            """
+            checklists = CheckList.objects.all()
+            checklistsinpro = CheckListDone.objects.filter(cld_status=3).order_by('-modified_date')
+            checklistsdone = CheckListDone.objects.filter(cld_status=1).order_by('-modified_date')[:20]
+        else:
+            """
+            checklists = ChecklistTable(CheckList.objects.filter(Q(chk_company=request.user.user_company) |
+                                                                 Q(chk_company=999999) & Q(chk_enable=True)))
+            checklistsinpro = ChecklistdoneTable(CheckListDone.objects.filter(
+                                                 Q(cld_company=request.user.user_company) & \
+                                                 Q(cld_status=1)).order_by('-modified_date'))
+            """
+            checklists = CheckList.objects.filter(Q(chk_company=request.user.user_company) |
+                                                  Q(chk_company=999999) & Q(chk_enable=True))
+            checklistsinpro = CheckListDone.objects.filter(Q(cld_company=request.user.user_company) & \
+                                                           Q(cld_status=1)).order_by('-modified_date')
+            checklistsdone = CheckListDone.objects.filter(Q(cld_company=request.user.user_company) & \
+                                                          Q(cld_status=1)).order_by('-modified_date')[:20]
+
+        # Cat paginator
+
+        chklst_page = request.GET.get('chklstpage', 1, )
+        chklst_paginator = Paginator(checklists, 5)
+        try:
+            chklst_users = chklst_paginator.page(chklst_page)
+        except PageNotAnInteger:
+            chklst_users = chklst_paginator.page(1)
+        except EmptyPage:
+            chklst_users = chklst_paginator.page(chklst_paginator.num_pages)
+
+        # Lines paginator
+
+        clpro_page = request.GET.get('chklstinpropage', 1, )
+        clpro_paginator = Paginator(checklistsinpro, 5)
+        try:
+            clpro_users = clpro_paginator.page(clpro_page)
+        except PageNotAnInteger:
+            clpro_users = clpro_paginator.page(1)
+        except EmptyPage:
+            clpro_users = clpro_paginator.page(clpro_paginator.num_pages)
+        """
+        RequestConfig(request, paginate={"per_page": 5}).configure(checklists)
+        RequestConfig(request, paginate={"per_page": 5}).configure(checklistsinpro)
+        """
+        context['checklists'] = checklists
+        context['checklistsdone'] = checklistsdone
+        context['checklistsinpro'] = checklistsinpro
+        context['chklst_users'] = chklst_users
+        context['clpro_users'] = clpro_users
+        context['cur_page_chklst'] = chklst_page
+        context['cur_page_clpro'] = clpro_page
+        return render(request, "app_home/newmain.html", context=context)
+
+
+
+

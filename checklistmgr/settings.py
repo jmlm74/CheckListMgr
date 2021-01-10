@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_tables2',
+
     'bootstrap_modal_forms',
     'widget_tweaks',
     'django_extensions',

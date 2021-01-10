@@ -44,8 +44,15 @@
                     <a id="pdf-preview" class="btn btn-primary" target="_blank" rel="noopener"
                        href="{%  url 'app_checklist:pdf' %} ">{% dis_play "PDFPreview" %}</a>
                 </div>
-                <div class="col-12 col-md-3 mb-3">
-                    <input type="submit" class="btn btn-primary" value="{% dis_play "Save" %}"/>
+                <div class="col-6 col-md-3 mb-3">
+                    <div class="col-6 col-md-3 mb-3">
+                        <input type="submit" class="btn btn-primary" name="submit" value="{% dis_play "Save" %}"/>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 mb-3">
+                    <div class="col-6 col-md-3 mb-3">
+                        <input type="submit" class="btn btn-warning" name="keep" value="{% dis_play "Keep" %}"/>
+                    </div>
                 </div>
             </div>
         </form>

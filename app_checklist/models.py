@@ -16,7 +16,12 @@ class CheckListDone(models.Model):
     """
     Checklist
     """
-    cld_status = models.PositiveSmallIntegerField(default=0, verbose_name="Status")
+    class Status(models.IntegerChoices):
+        INPROGRESS = 0
+        TERMINATED = 1
+        SAVED = 2
+
+    cld_status = models.IntegerField(choices=Status.choices, default=0, verbose_name="Status")
     cld_key = models.CharField(max_length=15, verbose_name="Key", null=True,
                                default=cld_default_id)
     cld_mail_sent = models.BooleanField(default=False, verbose_name='Mail sent')
