@@ -6,7 +6,7 @@
 
     <div class="row align-items-top justify-content-center text-center col-12 small">
         {% include 'partials/_errormessage.html' %}
-        <table id="cat_table" class="table">
+        <table id="checklist-table" data-order='[[ 0, "asc" ]]' class="table table-striped w-100" >
             <thead>
                 <tr>
                     <th class="text-center" style="width: 5em;" scope="col">#</th>
@@ -15,13 +15,13 @@
                     {% if user.is_superuser %}
                         <th class="text-center" style="width: 5em;" scope="col">{% dis_play "Company" %}</th>
                     {% endif %}
-                    <th class="text-center" style="width: 10em;" scope="col"></th>
                 </tr>
             </thead>
             <tbody>
-            {% for chklst in chklst_users %}
+            {#  {% for chklst in chklst_users %} #}
+            {% for chklst in checklists %}
                 <tr>
-                    <th class="text-center" scope="row">{{ forloop.counter }}</th>
+                    <td class="text-center" scope="row">{{ forloop.counter }}</td>
                     {% if not user.pro %}
                         <td class="text-center">
                             <a href={% url 'app_checklist:saisie3-priv' chklst.pk %}>{{ chklst.chk_key }}</a>
@@ -37,6 +37,6 @@
             {% endfor %}
             </tbody>
         </table>
-        {% include 'app_home/partials/_chklstpaginator.html' with page_obj=chklst_users %}
+        {# {% include 'app_home/partials/_chklstpaginator.html' with page_obj=chklst_users %} #}
     </div>
 </div>

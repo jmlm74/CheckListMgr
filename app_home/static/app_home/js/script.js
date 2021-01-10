@@ -278,6 +278,16 @@ if (document.querySelector("#form-search")) {
         init();
         e.preventDefault()
     })
+
+    /**************/
+    /* Datatables */
+    /**************/
+    $('#checklist-table').DataTable({
+        "ordering": true,
+        "searching": false,
+        "pagingType": "full_numbers",
+        "responsive": true,
+    });
 }
 
 
