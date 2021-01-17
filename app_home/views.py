@@ -1,16 +1,16 @@
+import itertools
 import json
 
 from django.contrib.auth import authenticate, login
 from django.core import serializers
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, reverse
 from django.views import View
 from django.views.generic.base import TemplateView
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django_tables2 import MultiTableMixin, tables, RequestConfig
+from django_tables2 import tables, RequestConfig, A
+from django.utils.html import format_html
 
 from sortable_listview import SortableListView
 
@@ -19,6 +19,9 @@ from app_checklist.models import CheckListDone
 from app_create_chklst.models import CheckList
 from app_input_chklst.models import Material, Manager
 from app_user.forms import UserCheckListMgrFormLogin
+from app_utilities.models import Translation
+
+language = "UK"
 
 
 class Index(View):
@@ -123,12 +126,13 @@ class MainView(SortableListView):
             checklistsdone = CheckListDone.objects.filter(cld_status=1).order_by('-modified_date')[:20]
         else:
             checklistsdone = CheckListDone.objects.filter(cld_company=self.request.user.user_company).\
-            filter(cld_status=1).order_by('-modified_date')[:20]
+                             filter(cld_status=1).order_by('-modified_date')[:20]
         context['checklistsdone'] = checklistsdone
         return context
 
 
 def autocomplete_search_mat(request):
+    data = {}
     if request.method == 'POST':
         request_data = json.loads(request.read().decode('utf-8'))
         manager = request_data['manager']
@@ -145,6 +149,7 @@ def autocomplete_search_mat(request):
 
 
 def autocomplete_search_man(request):
+    data = {}
     if request.method == 'POST':
         request_data = json.loads(request.read().decode('utf-8'))
         material = request_data['material']
@@ -161,6 +166,7 @@ def autocomplete_search_man(request):
 
 
 def search_chklst(request):
+    data = {}
     if request.method == 'POST':
         request_data = json.loads(request.read().decode('utf-8'))
         query = Q(cld_status=1)
@@ -199,18 +205,72 @@ def search_chklst(request):
 
 
 class ChecklistTable(tables.Table):
+    counter = tables.columns.Column(empty_values=(), orderable=False, verbose_name="#")
+
+    def __init__(self, *args, **kwargs):
+        self.row_counter = itertools.count()
+        if args[2]:
+            self.base_columns['chk_key'] = tables.columns.LinkColumn('app_checklist:saisie1', args=[A('pk')])
+        else:
+            self.base_columns['chk_key'] = tables.columns.LinkColumn('app_checklist:saisie3-priv', args=[A('pk')])
+        self.base_columns['chk_title'].verbose_name = Translation.get_translation('Wording', language=args[1])
+        self.base_columns['chk_key'].verbose_name = Translation.get_translation('Key', language=args[1])
+        self.base_columns['chk_company.company_name'].verbose_name = Translation.get_translation('Company',
+                                                                                                 language=args[1])
+        super(ChecklistTable, self).__init__(*args, **kwargs)
+
     class Meta:
         model = CheckList
-        fields = ('chk_key', 'chk_title', 'chk_company.company_name')
+        fields = ('counter', 'chk_key', 'chk_title', 'chk_company.company_name')
+        attrs = {'class': 'table table-striped table-hover'}
 
+    def render_counter(self):
+        self.row_counter = getattr(self, 'row_counter', itertools.count())
+        return next(self.row_counter) + 1
 
 
 class ChecklistdoneTable(tables.Table):
+    counter = tables.columns.Column(empty_values=(), orderable=False, verbose_name="#")
+    col_del = tables.columns.Column(empty_values=(),
+                                    orderable=False,
+                                    verbose_name="")
+                                   
+
     class Meta:
         model = CheckListDone
+        fields = ('counter', 'cld_key', 'cld_title', 'cld_mat', 'cld_man', 'cld_user.username', 'col_del')
+        attrs = {'class': 'table table-striped table-hover'}
+
+    def __init__(self, *args, **kwargs):
+        self.row_counter = itertools.count()
+        if args[2]:
+            self.base_columns['cld_key'] = tables.columns.LinkColumn('app_checklist:saisie1', args=[A('pk'),
+                                                                                                    ('inprogress')])
+        else:
+            self.base_columns['cld_key'] = tables.columns.LinkColumn('app_checklist:saisie3-priv', args=[A('pk')])
+        self.base_columns['cld_title'].verbose_name = Translation.get_translation('Wording', language=args[1])
+        self.base_columns['cld_key'].verbose_name = Translation.get_translation('Key', language=args[1])
+        self.base_columns['cld_mat'].verbose_name = Translation.get_translation('Material', language=args[1])
+        self.base_columns['cld_man'].verbose_name = Translation.get_translation('Manager', language=args[1])
+        self.base_columns['cld_user.username'].verbose_name = Translation.get_translation('User', language=args[1])
+        super(ChecklistdoneTable, self).__init__(*args, **kwargs)
+
+    def render_counter(self):
+        self.row_counter = getattr(self, 'row_counter', itertools.count())
+        return next(self.row_counter) + 1
+
+    def render_col_del(self, *args, **kwargs):
+        # print(kwargs['record'].cld_key)
+        data_dsp = str(kwargs['record'].cld_key) + " - " + str(kwargs['record'].cld_title)
+        tooltip = Translation.get_translation("Delete", username=self.request.user)
+        var = '<span data-tooltip="' + tooltip + '"  class="trash" data-pk="' + str(kwargs['record']) + '" \
+               data-dsp="' + data_dsp + '">\
+               <i class="tabicon fas fa-trash-alt" style="color: red; !important"></i></span>'
+        return format_html(var)
+
 
 def new_main_view(request):
-
+    global language
     context = {'title': "Main"}
     if request.method == 'POST':
         return render(request, "app_home/newmain.html", context=context)
@@ -218,62 +278,30 @@ def new_main_view(request):
         list(messages.get_messages(request))
         # get Check-lists & Check-lists done
         if request.user.is_superuser:
-            """
-            checklists = ChecklistTable(CheckList.objects.all())
-            checklistsinpro = ChecklistdoneTable(CheckListDone.objects.filter(cld_status=3).order_by('-modified_date'))
-            """
-            checklists = CheckList.objects.all()
-            checklistsinpro = CheckListDone.objects.filter(cld_status=3).order_by('-modified_date')
+            checklists = ChecklistTable(CheckList.objects.all(),
+                                        request.user.preferred_language.code,
+                                        request.user.pro, prefix="1-")
+            checklistsinpro = ChecklistdoneTable(CheckListDone.objects.filter(cld_status=3).order_by('-modified_date'),
+                                                 request.user.preferred_language.code,
+                                                 request.user.pro, prefix="2-")
             checklistsdone = CheckListDone.objects.filter(cld_status=1).order_by('-modified_date')[:20]
         else:
-            """
             checklists = ChecklistTable(CheckList.objects.filter(Q(chk_company=request.user.user_company) |
-                                                                 Q(chk_company=999999) & Q(chk_enable=True)))
+                                                                 Q(chk_company=999999) & Q(chk_enable=True)),
+                                        request.user.preferred_language.code,
+                                        request.user.pro, prefix="1-")
             checklistsinpro = ChecklistdoneTable(CheckListDone.objects.filter(
                                                  Q(cld_company=request.user.user_company) & \
-                                                 Q(cld_status=1)).order_by('-modified_date'))
-            """
-            checklists = CheckList.objects.filter(Q(chk_company=request.user.user_company) |
-                                                  Q(chk_company=999999) & Q(chk_enable=True))
-            checklistsinpro = CheckListDone.objects.filter(Q(cld_company=request.user.user_company) & \
-                                                           Q(cld_status=1)).order_by('-modified_date')
+                                                 Q(cld_status=3)).order_by('-modified_date'),
+                                                 request.user.preferred_language.code,
+                                                 request.user.pro, prefix="2-")
             checklistsdone = CheckListDone.objects.filter(Q(cld_company=request.user.user_company) & \
                                                           Q(cld_status=1)).order_by('-modified_date')[:20]
 
-        # Cat paginator
-
-        chklst_page = request.GET.get('chklstpage', 1, )
-        chklst_paginator = Paginator(checklists, 5)
-        try:
-            chklst_users = chklst_paginator.page(chklst_page)
-        except PageNotAnInteger:
-            chklst_users = chklst_paginator.page(1)
-        except EmptyPage:
-            chklst_users = chklst_paginator.page(chklst_paginator.num_pages)
-
-        # Lines paginator
-
-        clpro_page = request.GET.get('chklstinpropage', 1, )
-        clpro_paginator = Paginator(checklistsinpro, 5)
-        try:
-            clpro_users = clpro_paginator.page(clpro_page)
-        except PageNotAnInteger:
-            clpro_users = clpro_paginator.page(1)
-        except EmptyPage:
-            clpro_users = clpro_paginator.page(clpro_paginator.num_pages)
-        """
         RequestConfig(request, paginate={"per_page": 5}).configure(checklists)
         RequestConfig(request, paginate={"per_page": 5}).configure(checklistsinpro)
-        """
+
         context['checklists'] = checklists
         context['checklistsdone'] = checklistsdone
         context['checklistsinpro'] = checklistsinpro
-        context['chklst_users'] = chklst_users
-        context['clpro_users'] = clpro_users
-        context['cur_page_chklst'] = chklst_page
-        context['cur_page_clpro'] = clpro_page
         return render(request, "app_home/newmain.html", context=context)
-
-
-
-

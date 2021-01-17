@@ -141,6 +141,9 @@ if (document.querySelector("#form-search")) {
     const search_man = document.getElementById('search-manager');
     const search_date = document.getElementById('search-date');
     const search_btn = document.getElementById('search-button');
+    const delete_btn = document.getElementById('delete-button');
+    let del_chklstdone_pk = 0;
+    let del_chklstdone_dsp = 0;
 
     const get_materials = (manager) =>{
         let data={}
@@ -273,11 +276,39 @@ if (document.querySelector("#form-search")) {
             get_materials(search_man.value);
         }
     })
+    /*****************************/
+    /* The checklist in progress */
+    /*****************************/
     search_btn.addEventListener('click', e =>{
         get_checklists();
         init();
         e.preventDefault()
     })
+    document.querySelectorAll('.trash').forEach(item => {
+        item.addEventListener('click', event => {
+            document.querySelector('.bg-modal').style.display = 'flex';
+            del_chklstdone_pk = item.getAttribute("data-pk");
+            del_chklstdone_dsp = item.getAttribute("data-dsp");
+            document.getElementById("modal-data-dsp").innerHTML= del_chklstdone_dsp;
+        });
+    });
+    delete_btn.addEventListener('click', event =>{
+        // console.log(del_chklstdone_pk);
+        let data = {'pk': del_chklstdone_pk};
+        data = JSON.stringify(data);
+        SendAjax('POST', '/app_checklist/chklstdonedelete/', data, csrfToken)
+        .done(function (response) {
+            location.reload();
+        })
+        .fail(function (response) {
+            console.error("Erreur Ajax : " + response.data);
+        });
+
+    })
+    document.querySelector('.close').addEventListener('click',() => {
+        document.querySelector('.bg-modal').style.display ='none';
+    });
+
 }
 
 

@@ -29,13 +29,11 @@ urlpatterns = [
     path('app_create_chklst/', include('app_create_chklst.urls')),
     path('app_input_chklst/', include('app_input_chklst.urls')),
     path('app_checklist/', include('app_checklist.urls')),
-    path('app_checklist/', include('app_chklst_inprogress.urls')),
     path('', ahv.Index.as_view(), name='index'),
     path('accounts/login/', RedirectView.as_view(url='/app_home/index/')),
     path('reset/done/',
-         auth_views.PasswordResetCompleteView.as_view(template_name='app_user/registration/reset_password_complete.html'),
-         name='password_reset_complete'),
-
+         auth_views.PasswordResetCompleteView.as_view(
+             template_name='app_user/registration/reset_password_complete.html'), name='password_reset_complete'),
 ]
 
 handler400 = 'app_home.errors.handler400'

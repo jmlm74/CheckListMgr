@@ -11,10 +11,9 @@ app_name = 'app_home'
 urlpatterns = [
     path('', ahv.Index.as_view(), name='index'),
     path('index/', ahv.Index.as_view(), name='index'),
-    path('main/', ahv.MainView.as_view(), name='main'),
     path('legal/', ahv.LegalView.as_view(), name='legal'),
     path('contact/', ahv.ContactView.as_view(), name='contact'),
-    path('newmain/', ahv.new_main_view, name='newmain'),
+    path('main/', ahv.new_main_view, name='main'),
 
     # ajax autocomplete select
     path('autocomplete_search_mat/', ahv.autocomplete_search_mat, name='autosearchmat'),

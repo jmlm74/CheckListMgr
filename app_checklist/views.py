@@ -4,9 +4,11 @@ import os
 from django.conf import settings
 from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse, reverse_lazy
 from django.views import View
+
+from bootstrap_modal_forms.generic import BSModalDeleteView
 
 from app_checklist.forms import ChekListInput1Form, ChekListInput2Form, ChekListInput3Form
 from app_checklist.models import CheckListDone
@@ -15,12 +17,14 @@ from app_create_chklst.models import CheckList
 
 """
 All of the views above have the same principe to catch Next & Previous buttons.
-The views are a workflow --> you enter e material then a manager then The Check-list, 
+The views are a workflow --> you enter e material then a manager then The Check-list,
     finally the name... eventually preview the pdf file then save it en send it by mail.
                          --> in Each step you can go previous or next without loosing data
-All the page datas are stored in session data (dicts - POST methods) to retrieve 
+All the page datas are stored in session data (dicts - POST methods) to retrieve
 them when the page is reloaded (GET method)
 """
+
+
 class ChekListInput1(View):
     """
     view for input material for a checklist
@@ -31,6 +35,10 @@ class ChekListInput1(View):
     context_object_name = 'material'
 
     def get(self, request, *args, **kwargs):
+        # if load from check-list in progress --> load the datas from checklistdone
+        if 'inprogress' in kwargs:
+            restore_chklst_inprogress(request, kwargs['pk'])
+            kwargs = None
         # 1st load of 1st page --> remove all the context of the workflow
         if kwargs:
             if 'mat' in request.session:
@@ -268,6 +276,7 @@ def getmanager(request):
     get manager --> Input json datafile : id
                 --> output json datafile : manager
     """
+    data = {}
     if request.method == 'POST':
         data = {'data': 'ERROR'}
         request_data = json.loads(request.read().decode('utf-8'))
@@ -287,6 +296,7 @@ def getmaterial(request):
     get material --> Input json datafile : id
                 --> output json datafile : material
     """
+    data = {}
     if request.method == 'POST':
         data = {'data': 'ERROR'}
         request_data = json.loads(request.read().decode('utf-8'))
@@ -307,3 +317,53 @@ def getmaterial(request):
             data['mat_material'] = ''
         # data = json.dumps(data)
     return JsonResponse(data)
+
+
+def restore_chklst_inprogress(request, cld_id):
+    """
+    Retrieve a checklistDone to input it again and maybe finish
+    args : request and id
+    returns : None
+    """
+    checklist_encours = get_object_or_404(CheckListDone, pk=cld_id)
+    request.session['mat'] = {'encours': 1,
+                              'id': checklist_encours.cld_material.id,
+                              'mat_registration': checklist_encours.cld_material.mat_registration,
+                              'mat_type': checklist_encours.cld_material.mat_type,
+                              'mat_model': checklist_encours.cld_material.mat_model,
+                              'material': checklist_encours.cld_material.mat_designation,
+                              'manager': checklist_encours.cld_manager.id, }
+    request.session['mgr'] = {'encours': 1,
+                              'id': checklist_encours.cld_manager.id,
+                              'mgr_contact': checklist_encours.cld_manager.mgr_contact,
+                              'mgr_phone': checklist_encours.cld_manager.mgr_phone,
+                              'mgr_email1': checklist_encours.cld_manager.mgr_email1,
+                              'mgr_email2': checklist_encours.cld_manager.mgr_email2,
+                              'manager': checklist_encours.cld_manager.mgr_name, }
+    request.session['checklist_id'] = checklist_encours.cld_checklist.id
+    request.session['newchecklist_id'] = cld_id
+    request.session['chklst'] = {'save':checklist_encours.cld_save,
+                                 'remsave': checklist_encours.cld_remsave}
+    request.session['chksave'] = {'cld_key': checklist_encours.cld_key,
+                                  'cld_remarks': checklist_encours.cld_remarks,
+                                  'cld_valid': checklist_encours.cld_valid}
+    request.session.modified = True
+    return None
+
+
+def chklstdone_delete(request):
+    """
+    Delete checklist Done
+    Ajax function --> The delete ChecklistDone --> status=2
+    """
+    data = {}
+    if request.method == 'POST':
+        data = {'data': 'ERROR'}
+        request_data = json.loads(request.read().decode('utf-8'))
+        cld_pk = request_data['pk']
+        cld = CheckListDone.objects.get(pk=cld_pk)
+        cld.cld_status = 2
+        cld.save()
+        data = {'data': 'OK'}
+    return JsonResponse(data)
+

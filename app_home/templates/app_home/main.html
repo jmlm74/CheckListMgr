@@ -4,6 +4,7 @@
 {% load dis_play %}
 {% block body_block %}
 <div class="container">
+    {% include "partials/_modal.html" %}
     <div class="my_body" id="main">
         {% include 'partials/_title.html' %}
         <div class="row buttons col-12 mt-5 mb-5 align-items-center">
@@ -44,13 +45,6 @@
                     </button>
                 </a>
             </div>
-            <div class="ml-auto col-md-2 col-xl-2 d-none d-md-block">
-                            <button type="button" class="btn btn-warning btn-block">
-                                <i class="fas fa-3x fa-tasks"></i><br />
-                                {% dis_play "Inprogress" %}
-                            </button>
-                        </a>
-                    </div>
             {% else %}
                 <div class="offset-md-2 col-md-2 offset-xl-4 col-xl-2 d-none d-md-block">
                 {% if user.first_login %}
@@ -132,4 +126,9 @@
         {% include 'partials/_back.html' %}
     </div>
 </div>
+<script>
+const formURL = "{%  url 'app_create_chklst:chk-main' %}"
+const formURL2 = "{%  url 'app_create_chklst:chk-main' %}"
+const returnURL = "{% url 'app_create_chklst:chk-main' %}"
+</script>
 {% endblock body_block %}

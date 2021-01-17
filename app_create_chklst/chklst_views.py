@@ -24,11 +24,22 @@ class ChklstDeleteView(BSModalDeleteView):
     """
     Delete checklist
     --> Modal delete view
+    --> Get context data --> verify if no checklistdone inprogress is based on THIS checklist
+        --> NO --> can delete
+        --> YES --> can't delete --> msg the exit !
     """
     template_name = 'app_create_chklst/dialogboxes/deletechklst.html'
     model = CheckList
     success_message = 'DeletechklstOK'
     success_url = reverse_lazy('app_create_chklst:chk-main')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        chklst = CheckList.objects.get(pk=int(self.kwargs['pk']))
+        count_chklstdone_saved = chklst.cld_checklist.filter(cld_status=3).count()
+        context["countsaved"] = count_chklstdone_saved
+        return context
+    
 
 
 class ChklstDisplayView(BSModalReadView):
@@ -72,6 +83,7 @@ def create_chklst(request):
     :param request: all the checklist + lines & categories
     :return: OK or Erreur (just OK is verified !)
     """
+    data = {}
     if request.method == 'POST':
         data = {'data': 'ERROR'}
         request_data = json.loads(request.read().decode('utf-8'))
@@ -187,6 +199,11 @@ class ChkLstUpdateView(View):
     success_url = reverse_lazy('app_create_chklst:chk-main')
 
     def get(self, request, pk):
+        list(messages.get_messages(request))
+        checklist = CheckList.objects.get(pk=pk)
+        if checklist.cld_checklist.filter(cld_status=3).count() > 0:
+            messages.error(request, "ErrorUpdateSavedChklst")
+            return redirect(self.success_url)
         if request.user.is_superuser:
             categories = Category.objects.all().order_by('cat_company')
             lines = Line.objects.all().order_by('line_company')
@@ -197,7 +214,7 @@ class ChkLstUpdateView(View):
                 .order_by('line_key')
         self.context['categories'] = categories
         self.context['lines'] = lines
-        checklist = CheckList.objects.get(pk=pk)
+        
         details = checklist.chklst_detail()
         self.context['details'] = details
         self.context['checklist'] = checklist

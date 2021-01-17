@@ -112,6 +112,8 @@ def before_preview(request):
     newchecklist.cld_company = request.user.user_company
     newchecklist.cld_checklist = checklist
     newchecklist.cld_title = checklist.chk_title
+    newchecklist.cld_save = request.session['chklst']['save']
+    newchecklist.cld_remsave = request.session['chklst']['remsave']
     if request.session['mat']['id'] != '0':
         newchecklist.cld_material = Material.objects.get(pk=request.session['mat']['id'])
         newchecklist.cld_mat = newchecklist.cld_material.mat_designation
@@ -159,4 +161,3 @@ def file_remove_view(request):
         foto[0].delete()
         data = {'data': 'OK'}
     return JsonResponse(data)
-

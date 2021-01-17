@@ -212,3 +212,6 @@ SASS_PROCESSOR_ROOT = os.path.join(BASE_DIR, 'static')
 # compressor
 COMPRESS_PRECOMPILERS = (('text/x-scss', 'django_libsass.SassCompiler'),)
 COMPRESS_ROOT = STATIC_DIR
+
+# tables2
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4.html"

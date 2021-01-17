@@ -45,13 +45,6 @@
                     </button>
                 </a>
             </div>
-            <div class="ml-auto col-md-2 col-xl-2 d-none d-md-block">
-                            <button type="button" class="btn btn-warning btn-block">
-                                <i class="fas fa-3x fa-tasks"></i><br />
-                                {% dis_play "Inprogress" %}
-                            </button>
-                        </a>
-                    </div>
             {% else %}
                 <div class="offset-md-2 col-md-2 offset-xl-4 col-xl-2 d-none d-md-block">
                 {% if user.first_login %}
@@ -68,12 +61,17 @@
                     </div>
             {% endif %}
         </div>
-        {% include "app_home/partials/_newchecklisttable.html" %}
+        <div class="row mt-3">
+            <h3>{% dis_play "Checklists" %}</h3>
+        </div>
+        {% render_table checklists %}
         <hr class="bold-hr" />
-        {% include "app_home/partials/_newchecklistinprotable.html" %}
-        <hr class="bold-hr mt-3" />
+        <div class="row mt-3">
+            <h3 class="text-warning">{% dis_play "Checklistsinpro" %}</h3>
+        </div>
+        {% render_table checklistsinpro %}
+        <hr class="bold-hr" />
         <div class="row mt-2">
-
             <form id="form-search">
                 {% csrf_token %}
                 <div class="col-12">
@@ -133,6 +131,25 @@
             </div>
         </div>
         {% include 'partials/_back.html' %}
+    </div>
+    {#*************************************************** #}
+    {# Modal dialog box for remove Checklist in progress  #}
+    {#*************************************************** #}
+    <div class="bg-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{% dis_play "Deletechklstinprogress" %}</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="modal-body">
+                <p>{% dis_play "Msgdeletechkdone" %}</p><strong><span id="modal-data-dsp"></span></strong>
+            </div>
+            <div class="modal-footer">
+                <input type="button" id="delete-button" class="btn btn-danger" value="{% dis_play "Delete" %}" />
+            </div>
+        </div>
     </div>
 </div>
 {% endblock body_block %}

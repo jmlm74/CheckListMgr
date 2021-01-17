@@ -19,7 +19,8 @@ class CheckListDone(models.Model):
     class Status(models.IntegerChoices):
         INPROGRESS = 0
         TERMINATED = 1
-        SAVED = 2
+        DELETED = 2
+        SAVED2 = 3
 
     cld_status = models.IntegerField(choices=Status.choices, default=0, verbose_name="Status")
     cld_key = models.CharField(max_length=15, verbose_name="Key", null=True,
@@ -34,6 +35,8 @@ class CheckListDone(models.Model):
     cld_title = models.CharField(max_length=80, verbose_name="title", default="XXX")
     cld_valid = models.BooleanField(default=False, verbose_name="Valid")
     cld_remarks = models.TextField(verbose_name="Remarks", null=True)
+    cld_save = models.TextField(verbose_name='Questions/Replies', null=True, default=None)
+    cld_remsave = models.TextField(verbose_name='Categories Remarks', null=True, default=None)
 
     cld_user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="cld_user", null=True)
     cld_checklist = models.ForeignKey(CheckList, on_delete=models.SET_NULL, related_name='cld_checklist', null=True)

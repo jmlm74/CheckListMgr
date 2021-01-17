@@ -11,6 +11,7 @@ from app_checklist import pdfviews as acpv
 app_name = 'app_checklist'
 urlpatterns = [
     # main
+    path('saisie1/<int:pk>/<str:inprogress>/', login_required(acv.ChekListInput1.as_view()), name='saisie1'),
     path('saisie1/<int:pk>', login_required(acv.ChekListInput1.as_view()), name='saisie1'),
     path('saisie1/', login_required(acv.ChekListInput1.as_view()), name='saisie1'),
     path('saisie2/', login_required(acv.ChekListInput2.as_view()), name='saisie2'),
@@ -32,4 +33,6 @@ urlpatterns = [
     path('pdf/', login_required(acpv.render_pdf_view), name='pdf'),
     path('pdf/<str:save>/', login_required(acpv.render_pdf_view), name='pdf'),
 
+    # In progress - Ajax
+    path('chklstdonedelete/', login_required(acv.chklstdone_delete), name='cld-chkdelete'),
 ]
