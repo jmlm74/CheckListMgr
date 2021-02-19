@@ -1,6 +1,7 @@
 import json
 from datetime import date, datetime
 
+from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views import View
@@ -28,7 +29,8 @@ class ChekListInput4(View):
         # 1st load
         if 'chksave' not in request.session or request.session['chksave'] == 0:
             request.session['chksave'] = {}
-            request.session['chksave'] = 0
+            # request.session['chksave'] = 0
+            request.session['chksave']['cld_status'] = 0
             self.context['form'] = self.form
         else:
             newchecklist = CheckListDone.objects.get(pk=request.session['newchecklist_id'])
@@ -37,23 +39,38 @@ class ChekListInput4(View):
             for foto in fotos:
                 fotosave.append(str(foto.pho_file))
                 # print(foto.pho_file)
+            # date format not jsonified --> None becomes 'None' !
+            if request.session['chksave']['cld_date_valid'] == 'None':
+                cld_date_valid = None
+            else:
+                cld_date_valid = request.session['chksave']['cld_date_valid']
             self.context['form'] = self.form(initial={'cld_key': request.session['chksave']['cld_key'],
                                                       'cld_valid': request.session['chksave']['cld_valid'],
                                                       'cld_remarks': request.session['chksave']['cld_remarks'],
+                                                      'cld_date_valid': cld_date_valid,
+                                                      'cld_email': request.session['chksave']['cld_email'],
                                                       'cld_fotosave': fotosave})
         return render(request, self.template_name, context=self.context)
 
     def post(self, request, *args, **kwargs):
         form = self.form(request.POST)
         if form.is_valid():
-            new_checklist = before_preview(request)
             # valid --> save the form in session
+            if 'cld_status' in request.session['chksave']:
+                cld_status = request.session['chksave']['cld_status']
+            else:
+                cld_status = 0
+            request.session['chksave'] = {}
+            request.session['chksave']['cld_key'] = form.cleaned_data['cld_key']
+            request.session['chksave']['cld_date_valid'] = form.cleaned_data['cld_date_valid']
+            request.session['chksave']['cld_valid'] = form.cleaned_data['cld_valid']
+            request.session['chksave']['cld_remarks'] = form.cleaned_data['cld_remarks']
+            request.session['chksave']['cld_status'] = cld_status
+            request.session['chksave']['cld_email'] = form.cleaned_data['cld_email']
+            new_checklist = before_preview(request)
+            # the request id jsonified but date format is NOT jsonified
+            request.session['chksave']['cld_date_valid'] = str(form.cleaned_data['cld_date_valid'])
             if 'previous' in request.POST:
-                request.session['chksave'] = {}
-                request.session['chksave']['cld_key'] = request.POST['cld_key']
-
-                request.session['chksave']['cld_valid'] = request.POST.get('cld_valid', False)
-                request.session['chksave']['cld_remarks'] = request.POST.get('cld_remarks', '')
                 return redirect('app_checklist:saisie3')
             elif 'keep' in request.POST:
                 new_checklist.cld_status = 3
@@ -63,7 +80,11 @@ class ChekListInput4(View):
                 new_checklist.cld_status = 1
                 new_checklist.save()
                 return redirect('app_checklist:pdf', save='1')
+        else:
+            messages.error(request, "Error - Fill the fields please")
 
+            return render(request, 'app_checklist/checklist_finale.html', {'form': form,
+                                                                           'title': self.context['title']})
         return redirect('app_home:main')
 
 
@@ -71,6 +92,7 @@ class ChekListInput4(View):
 def before_preview(request):
     """
     function to save datas in database before preview PDF and previous button.
+    Also called if ANY elt in the form page is modified (cf script.js)
     The save should be the same but if preview the POST request datas are not the same.
     If ajax --> get data in the "request post json data" and treat it
     If Previous button : Get the data in the request POST.
@@ -80,7 +102,7 @@ def before_preview(request):
     """
     newchecklist = CheckListDone.objects.get(pk=request.session['newchecklist_id'])
     checklist = CheckList.objects.get(pk=request.session['checklist_id'])
-    newchecklist.cld_status = 0
+    newchecklist.cld_status = request.session['chksave']['cld_status']
 
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
         is_ajax = True
@@ -93,11 +115,20 @@ def before_preview(request):
         if cld_valid:
             cld_valid = 'on'
         cld_remarks = request_data['cld_remarks']
+        cld_date_valid = request_data['cld_date_valid']
+        cld_email = request_data['cld_email']
+        if len(cld_date_valid) == 0:
+            cld_date_valid = None
     else:
         is_ajax = False
         cld_key = request.POST['cld_key']
         cld_valid = request.POST.get('cld_valid', 'off')
         cld_remarks = request.POST['cld_remarks']
+        cld_email = request.POST['cld_email']
+        if request.session['chksave']['cld_date_valid'] == 'None':
+            cld_date_valid = None
+        else:
+            cld_date_valid = request.session['chksave']['cld_date_valid']
 
     if len(cld_key) == 0:
         newchecklist.cld_key = str(datetime.now().timestamp())[:15]
@@ -108,10 +139,15 @@ def before_preview(request):
         newchecklist.cld_valid = True
     else:
         newchecklist.cld_valid = False
+
+
     newchecklist.cld_user = request.user
     newchecklist.cld_company = request.user.user_company
     newchecklist.cld_checklist = checklist
     newchecklist.cld_title = checklist.chk_title
+    newchecklist.cld_date_valid = cld_date_valid
+    newchecklist.cld_remarks = cld_remarks
+    newchecklist.cld_email = cld_email
     newchecklist.cld_save = request.session['chklst']['save']
     newchecklist.cld_remsave = request.session['chklst']['remsave']
     if request.session['mat']['id'] != '0':

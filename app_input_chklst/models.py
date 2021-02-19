@@ -16,6 +16,7 @@ class Manager(models.Model):
     mgr_email1 = models.EmailField(max_length=255, verbose_name='Email1', null=True, blank=True)
     mgr_email2 = models.EmailField(max_length=255, verbose_name='Email2', null=True, blank=True)
     mgr_enable = models.BooleanField(verbose_name="Enable", default=True)
+    mgr_lang = models.CharField(max_length=2, verbose_name='Language', blank=True, default='FR')
 
     mgr_company = models.ForeignKey(Company, on_delete=models.SET_NULL, related_name="mgr_company", null=True)
     mgr_address = models.ForeignKey(Address, on_delete=models.SET_NULL, related_name="mgr_address",

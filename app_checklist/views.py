@@ -342,11 +342,13 @@ def restore_chklst_inprogress(request, cld_id):
                               'manager': checklist_encours.cld_manager.mgr_name, }
     request.session['checklist_id'] = checklist_encours.cld_checklist.id
     request.session['newchecklist_id'] = cld_id
-    request.session['chklst'] = {'save':checklist_encours.cld_save,
+    request.session['chklst'] = {'save': checklist_encours.cld_save,
                                  'remsave': checklist_encours.cld_remsave}
     request.session['chksave'] = {'cld_key': checklist_encours.cld_key,
                                   'cld_remarks': checklist_encours.cld_remarks,
-                                  'cld_valid': checklist_encours.cld_valid}
+                                  'cld_valid': checklist_encours.cld_valid,
+                                  'cld_date_valid': str(checklist_encours.cld_date_valid),
+                                  'cld_status': 3}
     request.session.modified = True
     return None
 

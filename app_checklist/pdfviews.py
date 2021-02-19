@@ -10,6 +10,8 @@ from datetime import datetime
 from io import BytesIO
 from pathlib import Path
 from urllib.parse import urlparse
+
+from django.utils.datetime_safe import strftime
 from weasyprint import HTML, CSS
 
 from django.conf import settings
@@ -104,7 +106,7 @@ def send_mail(request, newchecklist, result, mgr):
                 auth=("api", settings.MAILGUN_KEY),
                 files=[("attachment", (filename, open(full_filename, "rb").read()))],
                 data=data)
-            # print(f"Retour send mail : {rc}")
+            print(f"Retour send mail : {rc}")
         except:
            pass
     return
@@ -127,7 +129,6 @@ def render_pdf_view(request, *args, **kwargs):
 
     checklist = CheckList.objects.get(pk=request.session['checklist_id'])
     details = checklist.chklst_detail()
-
 
     mgr = request.session['mgr']
     mat = request.session['mat']
@@ -171,9 +172,13 @@ def render_pdf_view(request, *args, **kwargs):
         'dict_choices': dict_choices,
         'details': details,
         'dict_remarks': dict_remarks,
-        'user': request.user
+        'user': request.user,
     }
-
+    # print(newchecklist.cld_date_valid)
+    if not newchecklist.cld_date_valid:
+        context['date_valid'] = None
+    else:
+        context['date_valid'] = newchecklist.cld_date_valid.strftime("%d/%m/%Y")
     # PDF generator
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'filename="report.pdf"'  # just for display not as attachement
@@ -185,9 +190,11 @@ def render_pdf_view(request, *args, **kwargs):
                      '@top-right{content: "Page " counter(page) " of " counter(pages);}}')
     result = html.write_pdf(stylesheets=[css])
     # save in media root
+    print(kwargs)
     if "save" in kwargs:
-        task = threading.Thread(target=send_mail, args=(request, newchecklist, result, mgr))
-        task.start()
+        #task = threading.Thread(target=send_mail, args=(request, newchecklist, result, mgr))
+        #task.start()
+        send_mail(request, newchecklist, result, mgr)
         return redirect('app_home:main')
     # render pdf --> return pdf response in browser
     with tempfile.NamedTemporaryFile(delete=True) as output:

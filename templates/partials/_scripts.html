@@ -19,6 +19,12 @@
     <script src="{% static 'js/scripts.js' %}"></script>
     <script src="{% static 'js/modul.js' %}" type="module"></script>
     <script src="{% static 'js/DragDropTouch.js' %}" type="module"></script>
+    <!-- DatePicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+            integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+            crossorigin="anonymous">
+    </script>
+    <script src="{% static 'js/pikaday.min.js' %}"></script>
     {% static "" as baseUrl %}
     {% if not appname %}
         <script src="{{ baseUrl }}app_home/js/script.js" type="module"></script>

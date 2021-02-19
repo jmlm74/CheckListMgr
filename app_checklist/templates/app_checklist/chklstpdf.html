@@ -152,6 +152,9 @@
                     {% endif %}
                 </div>
                 <p class="col-12 text-center font-weight-bold mt-3">{% dis_play "Uniqueident" %} : {{ Checklist.cld_key }}</p>
+                {% if date_valid %}
+                    <p class="col-12 text-center font-weight-bold mt-3">{% dis_play "Datevalid" %} : {{ date_valid }}</p>
+                {% endif %}
             </div>
             <hr class="bold-hr" />
             {% if fotos %}

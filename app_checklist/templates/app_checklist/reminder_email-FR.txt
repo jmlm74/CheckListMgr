@@ -1,0 +1,14 @@
+{% autoescape off %}
+Bonjour,
+
+Nous vous rappelons que la check-list effectué sur votre materiel {{ material }} le {{ date_checklist }} arrivera à \
+expiration le {{ date_valid}}.
+
+Cordialement.
+---
+{{ society }}
+{{ society1 }}
+{{ society2 }}
+{{ society3 }}
+
+{% endautoescape %}

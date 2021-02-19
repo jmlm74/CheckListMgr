@@ -286,7 +286,7 @@ if (document.querySelector("#form-search")) {
     })
     document.querySelectorAll('.trash').forEach(item => {
         item.addEventListener('click', event => {
-            document.querySelector('.bg-modal').style.display = 'flex';
+            document.querySelector('.new-bg-modal').style.display = 'flex';
             del_chklstdone_pk = item.getAttribute("data-pk");
             del_chklstdone_dsp = item.getAttribute("data-dsp");
             document.getElementById("modal-data-dsp").innerHTML= del_chklstdone_dsp;
@@ -306,7 +306,7 @@ if (document.querySelector("#form-search")) {
 
     })
     document.querySelector('.close').addEventListener('click',() => {
-        document.querySelector('.bg-modal').style.display ='none';
+        document.querySelector('.new-bg-modal').style.display ='none';
     });
 
 }

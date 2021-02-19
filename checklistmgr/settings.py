@@ -62,11 +62,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_tables2',
-
     'bootstrap_modal_forms',
     'widget_tweaks',
     'django_extensions',
     'crispy_forms',
+
     'app_utilities.apps.AppUtilitiesConfig',
     'app_user.apps.AppUserConfig',
     'app_home.apps.AppHomeConfig',
@@ -195,7 +195,7 @@ else:
     # MIDDLEWARE += ['whitenoise.middleware.WhiteNoiseMiddleware']
     # STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-MAILGUN_KEY = get_env_variable("MAILGUN_KEY", "")
+MAILGUN_KEY = get_env_variable("MAILGUN_APIKEY", "")
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 

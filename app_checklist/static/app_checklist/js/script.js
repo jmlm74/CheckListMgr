@@ -240,6 +240,56 @@ if ((document.getElementById('checklist_mat')) || (document.getElementById('chec
 
 if (document.getElementById('checklist_fin')) { // checklist_save : the dropzone
 
+    const maj_chklstdone = () => {
+        let data = {}
+        data['cld_key'] = document.getElementById("id_cld_key").value
+        data['cld_valid'] = document.getElementById("id_cld_valid").checked
+        data['cld_remarks'] = document.getElementById("id_cld_remarks").value
+        data['cld_date_valid'] = document.getElementById("id_cld_date_valid").value
+        data['cld_email'] = document.getElementById("id_cld_email").value
+        data = JSON.stringify(data);
+        // ici send ajax
+        SendAjax('POST', '/app_checklist/beforepreview/', data, csrfToken)
+            .done(function (response) {
+                return true;
+            });
+    }
+    /**************/
+    /* DatePicker */
+    /**************/
+    let dat_valid = document.getElementById("id_cld_date_valid")
+    // let instance = new dtsel.DTS('input[name="cld_date_valid"]');
+    let mois = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    let picker = new Pikaday({ field: document.getElementById('id_cld_date_valid'),
+                               format: 'DD/MM/YYYY',
+                               firstDay: 1,
+                               minDate: new Date(),
+                               toString(date, format){
+                                   return moment(date).format('YYYY-MM-DD')
+                               },
+                               i18n: {
+                                    previousMonth: 'Mois précédent',
+                                    nextMonth    : 'Mois suivant',
+                                    months       : mois,
+                                    weekdays     : ['Dimanche', 'Lundi', 'Mardi', 'Mercredi',
+                                                    'Jeudi', 'Vendredi', 'Samedi'],
+                                    weekdaysShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
+                               },
+    });
+    dat_valid.addEventListener("focusout", e => {
+        if(dat_valid.value != ''){
+            if (Date.parse(dat_valid.value)) {
+                document.getElementById("error_dat_valid").innerHTML=""
+            } else {
+                document.getElementById("error_dat_valid").innerHTML="Error"
+            }
+        }
+    });
+    /******************/
+    /* Fin DatePicker */
+    /******************/
+
     /************/
     /* DROPZONE */
     /************/
@@ -298,17 +348,30 @@ if (document.getElementById('checklist_fin')) { // checklist_save : the dropzone
     /****************/
     /* FIN DROPZONE */
     /****************/
+
+    /**********************************/
+    /* Clique & change on pdf preview */
+    /**********************************/
     const csrfToken = getCookie('csrftoken');
     document.getElementById("pdf-preview").addEventListener("click", e => {
-        let data = {}
-        data['cld_key'] = document.getElementById("id_cld_key").value
-        data['cld_valid'] = document.getElementById("id_cld_valid").checked
-        data['cld_remarks'] = document.getElementById("id_cld_remarks").value
-        data = JSON.stringify(data);
-            // ici send ajax
-            SendAjax('POST', '/app_checklist/beforepreview/', data, csrfToken)
-                .done(function (response) {
-                    return true;
-                });
+        maj_chklstdone()
     });
+    document.getElementById("id_cld_key").addEventListener("change", e => {
+        maj_chklstdone()
+    });
+    document.getElementById("id_cld_date_valid").addEventListener("change", e => {
+        maj_chklstdone()
+    });
+    document.getElementById("id_cld_valid").addEventListener("change", e => {
+        maj_chklstdone()
+    });
+    document.getElementById("id_cld_remarks").addEventListener("change", e => {
+        maj_chklstdone()
+    });
+    document.getElementById("id_cld_email").addEventListener("change", e => {
+        maj_chklstdone()
+    });
+    /**************************************/
+    /* Fin Clique & change on pdf preview */
+    /**************************************/
 }

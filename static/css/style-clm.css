@@ -20,22 +20,18 @@ textarea.legal {
 .legal-nav {
   color: dodgerblue !important; }
 
-.bg-modal {
+.new-bg-modal {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  /* make it half transparent */
   position: absolute;
   top: 0px;
   z-index: 1;
   display: none;
-  /* It will remain invisible until you open */
   justify-content: center;
-  /*center horizontally*/
-  align-items: center;
-  /* center vertically */ }
+  align-items: center; }
 
-.modal-content {
+.new-modal-content {
   width: 600px;
   height: 300px;
   background-color: white;
@@ -50,7 +46,6 @@ textarea.legal {
   right: 14px;
   font-size: 25px;
   transform: rotate(45deg);
-  /* will make it look like x */
   cursor: pointer; }
 
 /* End app_home style */
