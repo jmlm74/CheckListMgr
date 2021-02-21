@@ -1,9 +1,10 @@
 import datetime
-
 import requests
+
 from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.db.models import Q
 
 from app_checklist.models import CheckListDone
 from checklistmgr import settings
@@ -11,7 +12,7 @@ from checklistmgr import settings
 
 class Command(BaseCommand):
     """
-    Send mail to managers that chaecklist valid_date expire in 30 days
+    Send mail to managers that checklist valid_date expire in 30 days
     """
     help = 'Send mail reminder for expired checklists'
 
@@ -30,23 +31,22 @@ class Command(BaseCommand):
             Retrieve Checklists with valide_date = today + self.nb_days
             if email 1 or 2 --> Send mail in the manager's language
         """
-        # wishes = kwargs['wishes']
         time = timezone.now().strftime('%X')
         print("mail_reminder started at %s" % time)
         today = datetime.date.today()
         date_future = today + datetime.timedelta(days=self.nb_days)
-        chkdones = CheckListDone.objects.filter(cld_date_valid=date_future)
+
+        chkdones = CheckListDone.objects.filter(Q(cld_date_valid=date_future) &
+                                                Q(cld_reminder_sent=False) &
+                                                Q(cld_reminder=True))
         for chkdone in chkdones:
             list_email = []
-            print(chkdone.cld_manager)
+            # print(chkdone.cld_manager)
             if chkdone.cld_manager.mgr_email1:
-                # print('email1 : ', chkdone.cld_manager.mgr_email1)
                 list_email.append(chkdone.cld_manager.mgr_email1)
             if chkdone.cld_manager.mgr_email2:
-                # print('email2 : ', chkdone.cld_manager.mgr_email2)
                 list_email.append(chkdone.cld_manager.mgr_email2)
             if chkdone.cld_email:
-                # print('email : ', chkdone.cld_email)
                 list_email.append(chkdone.cld_email)
             if list_email:
                 language = chkdone.cld_manager.mgr_lang
@@ -74,7 +74,7 @@ class Command(BaseCommand):
                         "text": email,
                         }
                 mailgun_key = settings.MAILGUN_KEY
-                print(list_email)
+                # print(list_email)
                 try:
                     # send the mail
                     rc = requests.post(
@@ -85,4 +85,7 @@ class Command(BaseCommand):
                     print(f"Retour send mail : {rc}")
                 except:
                     pass
+                chkdone.cld_reminder_sent = True
+                chkdone.save()
+        time = timezone.now().strftime('%X')
         print("mail_reminder at %s" % time)

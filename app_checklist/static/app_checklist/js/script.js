@@ -247,6 +247,7 @@ if (document.getElementById('checklist_fin')) { // checklist_save : the dropzone
         data['cld_remarks'] = document.getElementById("id_cld_remarks").value
         data['cld_date_valid'] = document.getElementById("id_cld_date_valid").value
         data['cld_email'] = document.getElementById("id_cld_email").value
+        data['cld_reminder'] = document.getElementById("id_cld_reminder").value
         data = JSON.stringify(data);
         // ici send ajax
         SendAjax('POST', '/app_checklist/beforepreview/', data, csrfToken)
@@ -369,6 +370,9 @@ if (document.getElementById('checklist_fin')) { // checklist_save : the dropzone
         maj_chklstdone()
     });
     document.getElementById("id_cld_email").addEventListener("change", e => {
+        maj_chklstdone()
+    });
+    document.getElementById("id_cld_reminder").addEventListener("change", e => {
         maj_chklstdone()
     });
     /**************************************/

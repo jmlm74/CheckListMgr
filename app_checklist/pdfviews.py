@@ -103,7 +103,7 @@ def send_mail(request, newchecklist, result, mgr):
             # send the mail
             rc = requests.post(
                 "https://api.mailgun.net/v3/sandbox1f42285ff9e446fa9e90d34287cd8fee.mailgun.org/messages",
-                auth=("api", settings.MAILGUN_KEY),
+                auth=("api", settings.MAILGUN_APIKEY),
                 files=[("attachment", (filename, open(full_filename, "rb").read()))],
                 data=data)
             print(f"Retour send mail : {rc}")

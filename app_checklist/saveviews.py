@@ -32,7 +32,7 @@ class ChekListInput4(View):
             # request.session['chksave'] = 0
             request.session['chksave']['cld_status'] = 0
             self.context['form'] = self.form
-        else:
+        elif 'cld_key' in request.session['chksave']:
             newchecklist = CheckListDone.objects.get(pk=request.session['newchecklist_id'])
             fotos = newchecklist.pho_chklst.all()
             fotosave = []
@@ -49,7 +49,10 @@ class ChekListInput4(View):
                                                       'cld_remarks': request.session['chksave']['cld_remarks'],
                                                       'cld_date_valid': cld_date_valid,
                                                       'cld_email': request.session['chksave']['cld_email'],
+                                                      'cld_reminder': request.session['chksave']['cld_reminder'],
                                                       'cld_fotosave': fotosave})
+        else:
+            pass
         return render(request, self.template_name, context=self.context)
 
     def post(self, request, *args, **kwargs):
@@ -67,6 +70,7 @@ class ChekListInput4(View):
             request.session['chksave']['cld_remarks'] = form.cleaned_data['cld_remarks']
             request.session['chksave']['cld_status'] = cld_status
             request.session['chksave']['cld_email'] = form.cleaned_data['cld_email']
+            request.session['chksave']['cld_reminder'] = form.cleaned_data['cld_reminder']
             new_checklist = before_preview(request)
             # the request id jsonified but date format is NOT jsonified
             request.session['chksave']['cld_date_valid'] = str(form.cleaned_data['cld_date_valid'])
@@ -82,7 +86,6 @@ class ChekListInput4(View):
                 return redirect('app_checklist:pdf', save='1')
         else:
             messages.error(request, "Error - Fill the fields please")
-
             return render(request, 'app_checklist/checklist_finale.html', {'form': form,
                                                                            'title': self.context['title']})
         return redirect('app_home:main')
@@ -117,6 +120,8 @@ def before_preview(request):
         cld_remarks = request_data['cld_remarks']
         cld_date_valid = request_data['cld_date_valid']
         cld_email = request_data['cld_email']
+        if request_data['cld_reminder']:
+            cld_reminder = 'on'
         if len(cld_date_valid) == 0:
             cld_date_valid = None
     else:
@@ -125,6 +130,7 @@ def before_preview(request):
         cld_valid = request.POST.get('cld_valid', 'off')
         cld_remarks = request.POST['cld_remarks']
         cld_email = request.POST['cld_email']
+        cld_reminder = request.POST.get('cld_reminder', 'off')
         if request.session['chksave']['cld_date_valid'] == 'None':
             cld_date_valid = None
         else:
@@ -139,6 +145,10 @@ def before_preview(request):
         newchecklist.cld_valid = True
     else:
         newchecklist.cld_valid = False
+    if cld_reminder == 'on':
+        newchecklist.cld_reminder = True
+    else:
+        newchecklist.cld_reminder = False
 
 
     newchecklist.cld_user = request.user

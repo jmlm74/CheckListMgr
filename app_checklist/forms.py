@@ -33,10 +33,10 @@ class ChekListInput1Form(forms.Form):
 
 class ChekListInput2Form(forms.Form):
     mgr_name = forms.ModelChoiceField(label="Owner", queryset=Manager.objects.all())
-    mgr_contact = forms.CharField(initial='', max_length=30, label="Contact", disabled=True)
-    mgr_phone = forms.CharField(initial='', max_length=31, label="Phone", disabled=True)
-    mgr_email1 = forms.EmailField(initial='', max_length=255, label='Email1', disabled=True)
-    mgr_email2 = forms.EmailField(initial='', max_length=255, label='Email2', disabled=True)
+    mgr_contact = forms.CharField(initial='', max_length=30, label="Contact")
+    mgr_phone = forms.CharField(initial='', max_length=31, label="Phone")
+    mgr_email1 = forms.EmailField(initial='', max_length=255, label='Email1')
+    mgr_email2 = forms.EmailField(initial='', max_length=255, label='Email2')
     mgr_id = forms.IntegerField(initial=0, label='id')
 
     class Meta:
@@ -74,12 +74,13 @@ class ChekListInput4Form(forms.Form):
     cld_valid = forms.BooleanField(label='Checklist Valid')
     cld_remarks = forms.CharField(widget=forms.Textarea(attrs={'rows': '5', 'cols': '50', }))
     cld_date_valid = forms.DateField(widget=forms.DateInput(attrs={'size': '10'}))
-    cld_email = forms.EmailField()
+    cld_email = forms.EmailField(label='Email ')
+    cld_reminder = forms.BooleanField(label='Reminder', initial=False)
 
     cld_fotosave = forms.CharField(max_length=1000, label='foto_save')
 
     class Meta:
-        fields = ['cld_key', 'cld_valid', 'cld_remarks', 'cld_fotosave', 'cld_date_valid', 'cld_email']
+        fields = ['cld_key', 'cld_valid', 'cld_remarks', 'cld_fotosave', 'cld_date_valid', 'cld_email', 'cld_reminder']
 
     def __init__(self, *args, **kwargs):
         super(ChekListInput4Form, self).__init__(*args, **kwargs)
@@ -90,3 +91,4 @@ class ChekListInput4Form(forms.Form):
         self.fields['cld_fotosave'].required = False
         self.fields['cld_date_valid'].required = False
         self.fields['cld_email'].required = False
+        self.fields['cld_reminder'].required = False

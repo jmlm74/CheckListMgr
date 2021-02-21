@@ -38,8 +38,9 @@ class CheckListDone(models.Model):
     cld_save = models.TextField(verbose_name='Questions/Replies', null=True, default=None)
     cld_remsave = models.TextField(verbose_name='Categories Remarks', null=True, default=None)
     cld_date_valid = models.DateField(null=True, blank=True, default=None)
-    cld_reminder = models.BooleanField(null=True, default=None)
+    cld_reminder = models.BooleanField(null=True, default=False, blank=True)
     cld_email = models.EmailField(max_length=255, verbose_name='Other Email', null=True, blank=True)
+    cld_reminder_sent = models.BooleanField(null=True, default=False, blank=True)
 
     cld_user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="cld_user", null=True)
     cld_checklist = models.ForeignKey(CheckList, on_delete=models.SET_NULL, related_name='cld_checklist', null=True)
