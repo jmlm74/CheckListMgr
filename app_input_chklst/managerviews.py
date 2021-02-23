@@ -1,9 +1,10 @@
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalReadView, BSModalUpdateView, BSModalDeleteView
+from django.utils.datastructures import MultiValueDictKeyError
 from sortable_listview import SortableListView
 
 from django.contrib import messages
 from django.db.models import Q, RestrictedError
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 
 from app_input_chklst.forms import ManagerCreateForm
@@ -63,6 +64,17 @@ class ManagerCreateView(BSModalCreateView):
         context['btn'] = "Create"
         return context
 
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+        # Test if Ajax --> Bug or pb with BS-Modal and file upload !
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+            # print(request.POST)
+            # print(request.FILES)
+            if form.is_valid():
+                manager = Manager()
+                save_manager(manager, form)
+        return super().post(request, *args, **kwargs)
+
 
 class ManagerDisplayView(BSModalReadView):
     """
@@ -87,12 +99,24 @@ class ManagerUpdateView(BSModalUpdateView):
     success_message = 'UpdatemgrOK'
     success_url = reverse_lazy('app_input_chklst:inp-mgrmgmt')
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *arks, **kwargs):
         context = super(ManagerUpdateView, self).get_context_data(**kwargs)
         context['title'] = "Updatemgr"
         context['btn'] = "Update"
+        manager = Manager.objects.get(pk=self.kwargs['pk'])
+        context['manager'] = manager
         return context
 
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+        # Test if Ajax --> Bug or pb with BS-Modal and file upload !
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+            # print(request.POST)
+            # print(request.FILES)
+            if form.is_valid():
+                manager = Manager.objects.get(pk=kwargs['pk'])
+                save_manager(manager, form)
+        return super().post(request, *args, **kwargs)
 
 class ManagerDeleteView(BSModalDeleteView):
     """
@@ -111,3 +135,29 @@ class ManagerDeleteView(BSModalDeleteView):
         except RestrictedError:
             messages.error(request, self.error_message)
         return redirect(self.success_url)
+
+
+def save_manager(manager, form):
+    """
+    Save or update new manager from update or create form
+    """
+    manager.mgr_name = form.cleaned_data['mgr_name']
+    manager.mgr_contact = form.cleaned_data['mgr_contact']
+    manager.mgr_phone = form.cleaned_data['mgr_phone']
+    manager.mgr_email1 = form.cleaned_data['mgr_email1']
+    manager.mgr_email2 = form.cleaned_data['mgr_email2']
+    if form.cleaned_data['mgr_enable'] == 'on':
+        manager.mgr_enable = True
+    else:
+        manager.mgr_enable = False
+    manager.mgr_lang = form.cleaned_data['mgr_lang']
+    if form.cleaned_data['mgr_company']:
+        manager.mgr_company = form.cleaned_data['mgr_company']
+    manager.mgr_address = form.cleaned_data['mgr_address']
+    try:
+        if form.data['mgr_logo-clear'] == 'on':
+            manager.mgr_logo = None
+    except MultiValueDictKeyError:
+        if form.cleaned_data['mgr_logo']:
+            manager.mgr_logo = form.cleaned_data['mgr_logo']
+    manager.save()

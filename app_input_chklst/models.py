@@ -10,17 +10,25 @@ class Manager(models.Model):
     Foreign key : Address and Company
     Can be disabled --> not usable in checklist input
     """
+    class Language(models.TextChoices):
+        FRENCH = "FR", "FR"
+        ENGLISH = "EN", "EN"
+
     mgr_name = models.CharField(max_length=30, verbose_name="Owner")
     mgr_contact = models.CharField(max_length=30, verbose_name="Contact", null=True, blank=True)
     mgr_phone = models.CharField(max_length=31, verbose_name="Phone", null=True, blank=True)
     mgr_email1 = models.EmailField(max_length=255, verbose_name='Email1', null=True, blank=True)
     mgr_email2 = models.EmailField(max_length=255, verbose_name='Email2', null=True, blank=True)
     mgr_enable = models.BooleanField(verbose_name="Enable", default=True)
-    mgr_lang = models.CharField(max_length=2, verbose_name='Language', blank=True, default='FR')
-
+    mgr_lang = models.CharField(max_length=2,
+                                verbose_name='Language',
+                                choices=Language.choices,
+                                default=Language.FRENCH)
     mgr_company = models.ForeignKey(Company, on_delete=models.SET_NULL, related_name="mgr_company", null=True)
     mgr_address = models.ForeignKey(Address, on_delete=models.SET_NULL, related_name="mgr_address",
                                     null=True, blank=True)
+    mgr_logo = models.ImageField(upload_to='images/', height_field=None, width_field=None, max_length=200,
+                                 blank=True, null=True, verbose_name="Logo")
 
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True, blank=True)

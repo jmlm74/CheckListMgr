@@ -5,7 +5,7 @@ import tempfile
 import uuid
 import requests
 import weasyprint
-import threading
+
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -190,7 +190,7 @@ def render_pdf_view(request, *args, **kwargs):
                      '@top-right{content: "Page " counter(page) " of " counter(pages);}}')
     result = html.write_pdf(stylesheets=[css])
     # save in media root
-    print(kwargs)
+    # print(kwargs)
     if "save" in kwargs:
         #task = threading.Thread(target=send_mail, args=(request, newchecklist, result, mgr))
         #task.start()

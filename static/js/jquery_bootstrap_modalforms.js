@@ -1,6 +1,6 @@
 /*
 django-bootstrap-modal-forms
-version : 2.0.0
+version : 2.0.1
 Copyright (c) 2020 Uros Trstenjak
 https://github.com/trco/django-bootstrap-modal-forms
 */
@@ -9,13 +9,9 @@ https://github.com/trco/django-bootstrap-modal-forms
 
     // Open modal & load the form at formURL to the modalContent element
     var modalForm = function (settings) {
-        // console.log(settings)
-         // alert("modalform")
         $(settings.modalID).find(settings.modalContent).load(settings.formURL, function () {
-
             $(settings.modalID).modal("show");
             $(settings.modalForm).attr("action", settings.formURL);
-            // console.log("modalForm2")
             addEventHandlers(settings);
         });
     };
@@ -34,12 +30,12 @@ https://github.com/trco/django-bootstrap-modal-forms
 
     // Check if form.is_valid() & either show errors or submit it via callback
     var isFormValid = function (settings, callback) {
-
-        //console.log(settings.modalForm)
         $.ajax({
             type: $(settings.modalForm).attr("method"),
             url: $(settings.modalForm).attr("action"),
-            data: $(settings.modalForm).serialize(),
+            data: new FormData($(settings.modalForm)[0]),
+            contentType: false,
+            processData: false,
             beforeSend: function () {
                 $(settings.submitBtn).prop("disabled", true);
             },
@@ -51,7 +47,6 @@ https://github.com/trco/django-bootstrap-modal-forms
                     // Reinstantiate handlers
                     addEventHandlers(settings);
                 } else {
-
                     // Form is valid, submit it
                     callback(settings);
                 }
@@ -62,17 +57,21 @@ https://github.com/trco/django-bootstrap-modal-forms
     // Submit form callback function
     var submitForm = function (settings) {
         if (!settings.asyncUpdate) {
-            console.log(settings.modalForm)
             $(settings.modalForm).submit();
         } else {
             var asyncSettingsValid = validateAsyncSettings(settings.asyncSettings);
             var asyncSettings = settings.asyncSettings;
+
             if (asyncSettingsValid) {
+                var formdata = new FormData($(settings.modalForm)[0]);
+                // Add asyncUpdate and check for it in save method of CreateUpdateAjaxMixin
+                formdata.append("asyncUpdate", "True");
                 $.ajax({
                     type: $(settings.modalForm).attr("method"),
                     url: $(settings.modalForm).attr("action"),
-                    // Add asyncUpdate and check for it in save method of CreateUpdateAjaxMixin
-                    data: $(settings.modalForm).serialize() + "&asyncUpdate=True",
+                    data: formdata,
+                    contentType: false,
+                    processData: false,
                     success: function (response) {
                         var body = $("body");
                         if (body.length === 0) {
@@ -112,8 +111,6 @@ https://github.com/trco/django-bootstrap-modal-forms
     };
 
     var validateAsyncSettings = function (settings) {
-        //console.log("dans validateAsync")
-
         var missingSettings = [];
 
         if (!settings.successMessage) {
@@ -140,6 +137,7 @@ https://github.com/trco/django-bootstrap-modal-forms
         if (missingSettings.length > 0) {
             return false;
         }
+
         return true;
     };
 

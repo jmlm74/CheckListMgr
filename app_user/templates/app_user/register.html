@@ -40,7 +40,8 @@
                 <div class="form-row">
                     <div class="col-md-1">
                     {%  if user.picture %}
-                        <img src="{{ user.picture.url }}" alt="{% dis_play 'Picture' %}" />
+                        <img src="{{ user.picture.url }}" alt="{% dis_play 'Picture' %}"
+                             style="max-height:100px; max-width:100px; overflow: hidden"/>
                     {% endif %}
                     </div>
                 <div class="col-11 col-md-4 form-group">{% dis_play "User" %}* : {{ form.username }}</div>

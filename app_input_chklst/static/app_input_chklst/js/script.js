@@ -1,6 +1,18 @@
 /* *********************** */
 /* * Beginning Modal box * */
 /* *********************** */
+if (document.getElementById('id-mgrlogo')){
+    console.log("VUVUVUVU")
+    document.getElementById('id-mgrlogo').addEventListener("change", e => {
+        let logo_file = document.getElementById('logo').value;
+        console.log(logo_file);
+    });
+    document.getElementById('logo').addEventListener("change", e => {
+        let logo_file = document.getElementById('logo').value;
+        console.log(logo_file);
+    });
+}
+
 if ((document.getElementById('mgrmgmt')) || (document.getElementById('main'))) {    // manager page
 //JQuery is used for BSModal (Bootstrap)
     $(function () {
@@ -9,7 +21,7 @@ if ((document.getElementById('mgrmgmt')) || (document.getElementById('main'))) {
         console.log(formURL2)
         $("#create-mgr").modalForm({
             formURL: formURL,
-            modalID: "#create-modal"
+            modalID: "#create-modal-large"
         });
         $("#create-mat").modalForm({
             formURL: formURL,

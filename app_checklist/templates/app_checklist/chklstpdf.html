@@ -22,7 +22,7 @@
                 text-align      : center;
                 font-size       : 15px;
             }
-            img{
+            .myimg{
                 height:500px;
             }
             .borderj{
@@ -37,6 +37,16 @@
                 <div class="row justify-center">
                     <h3 class="col-10 text-center">{{ Checklist.cld_checklist.chk_title }}</h3>
                     <h6 class="col-2 justify-center">date : {% now "d/m/Y" %} </h6>
+                </div>
+                <div class="row">
+                    <div class="col-6 d-flex justify-content-start">
+                    </div>
+                    <div class="col-6 d-flex justify-content-end">
+                        {% if manager.mgr_logo %}
+                            <img src="file://{{ manager.mgr_logo.path }}" style="max-height:100px; max-width:100px;"
+                                 class="no-oveflow">
+                        {% endif %}
+                    </div>
                 </div>
             </header>
             {% if user.pro %}
@@ -166,7 +176,7 @@
                     {% for foto in fotos %}
                         {% cycle '<div class="row col-12 mt-3">' '' %}
                             <div class="col-6 justify-center text-center">
-                                <img src="file://{{ foto.pho_file.path }}" /> <br />
+                                <img src="file://{{ foto.pho_file.path }}" class="myimg"/> <br />
                                 <span class="text-center">{{ foto.pho_caption }}</span>
                             </div>
                         {% cycle '' '</div>' %}

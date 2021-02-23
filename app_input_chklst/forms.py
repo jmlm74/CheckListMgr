@@ -1,3 +1,8 @@
+from io import BytesIO
+from PIL import Image
+from bootstrap_modal_forms.mixins import PopRequestMixin, CreateUpdateAjaxMixin
+from django import forms
+
 from bootstrap_modal_forms.forms import BSModalModelForm
 from django.core.exceptions import ValidationError
 
@@ -22,15 +27,38 @@ class ManagerCreateForm(BSModalModelForm):
         self.fields['mgr_email2'].required = False
         self.fields['mgr_address'].required = False
         self.fields['mgr_company'].required = False
+        self.fields['mgr_logo'].required = False
+        self.fields['mgr_lang'].required = False
         self.fields['mgr_address'].initial = '----------'
         self.fields['mgr_company'].initial = None
 
-    def clean(self):
+    def clean(self, *args, **kwargs):
         super(ManagerCreateForm, self).clean()
-        if self.request.user.admin and self.cleaned_data['mgr_company'] is None:
-            self.cleaned_data['mgr_company'] = self.request.user.user_company
+        try:
+            if self.request.user.admin and self.cleaned_data['mgr_company'] is None:
+                self.cleaned_data['mgr_company'] = self.request.user.user_company
+        except AttributeError:
+            pass
+
         return self.cleaned_data
 
+
+    def clean_mgr_logo(self):
+        # picture is not in data --> no picture selected
+        if not self.cleaned_data['mgr_logo']:
+            self.cleaned_data['mgr_logo'] = ''
+            return
+        logo = self.cleaned_data['mgr_logo']
+        if logo:
+            photo_data = BytesIO(logo.read())
+            image = Image.open(photo_data)
+            width, height = image.size
+            if width > 600 or height > 600:
+                raise forms.ValidationError("Big_image")
+            print('OK')
+            return logo
+        else:
+            return ''
 
 class AddressCreateForm(BSModalModelForm):
     """
