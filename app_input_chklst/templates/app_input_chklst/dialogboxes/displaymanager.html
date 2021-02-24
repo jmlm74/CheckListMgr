@@ -4,7 +4,7 @@
 <div class="modal-header">
         <h3>{% dis_play title %}</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
+      <span aria-hidden="true">+</span>
     </button>
     </div>
 
@@ -40,6 +40,14 @@
             <span class="col-6 text-left">
             <strong>{% dis_play "Enable" %}* : </strong>{{ manager.mgr_enable|yesno }}
             </span>
+        </p>
+        <p class="row">
+            <div class="col-md-12">
+                {% if manager.mgr_logo %}
+                    <img src="{{ manager.mgr_logo.url }}"
+                         style="max-height:100px; max-width:100px; overflow: hidden"/>
+                {% endif %}
+            </div>
         </p>
 
         <div class="modal-footer">

@@ -76,10 +76,11 @@ class CompanyCreateForm(forms.ModelForm):
     address = forms.ModelChoiceField(queryset=Address.objects.exclude(address_name__exact='').order_by('address_name'),
                                      initial=0)
     update = forms.BooleanField(widget=forms.HiddenInput(), required=False, initial=False)
+    comp_logo = forms.ImageField(required=False)
 
     class Meta:
         model = Company
-        fields = ['company_name', 'address', 'update', ]
+        fields = ['company_name', 'address', 'update', 'comp_logo', ]
 
     def __init__(self, *args, **kwargs):
         super(CompanyCreateForm, self).__init__(*args, **kwargs)

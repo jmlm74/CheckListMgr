@@ -40,6 +40,10 @@
                 </div>
                 <div class="row">
                     <div class="col-6 d-flex justify-content-start">
+                        {% if Checklist.cld_company.comp_logo %}
+                            <img src="file://{{ Checklist.cld_company.comp_logo.path }}" style="max-height:100px; max-width:100px;"
+                                 class="no-oveflow">
+                        {% endif %}
                     </div>
                     <div class="col-6 d-flex justify-content-end">
                         {% if manager.mgr_logo %}

@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.db.models import ObjectDoesNotExist
 from django.db.models import Q
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.generic import View
 from django.views.generic.edit import UpdateView
 
@@ -104,9 +105,8 @@ class EditCompanyView(UpdateView):
     form2 = AddressCreateForm
     model = Company
     second_model = Address
-    fields = ['company_name', 'address']
+    fields = ['company_name', 'address', 'comp_logo']
     template_name = 'app_user/create_company.html'
-    # success_url = "/app_user/list_company/"
 
     def get_context_data(self, **kwargs):
         context = super(EditCompanyView, self).get_context_data(**kwargs)
@@ -120,6 +120,7 @@ class EditCompanyView(UpdateView):
             context['form2'] = self.form2(instance=address)
         context['id'] = form_id
         context['title'] = "Companyupdate"
+        context['company'] = company
         return context
 
     def get(self, request, *args, **kwargs):
@@ -129,9 +130,10 @@ class EditCompanyView(UpdateView):
     def post(self, request, pk):
         request.POST._mutable = True  # to modify the POST
         request.POST['update'] = True
-        form = self.form(request.POST)
+        form = self.form(request.POST, request.FILES)
         form2 = self.form2(request.POST)
         # form is always in error --> duplicate name !!!
+        form.is_valid()
         if form2.is_valid():
             form._errors = {}
             company = request.POST['company_name']
@@ -167,6 +169,7 @@ class EditCompanyView(UpdateView):
                 new_memo.save()
             upd_company = Company.objects.get(pk=pk)
             upd_company.address = new_memo
+            upd_company.comp_logo = form.cleaned_data['comp_logo']
             upd_company.save()
             self.context['id'] = pk
             messages.success(request, "CompanyupdateOK")

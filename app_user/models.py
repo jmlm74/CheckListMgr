@@ -52,6 +52,9 @@ class Company(models.Model):
                                     unique=True)
     address = models.ForeignKey(Address, on_delete=models.RESTRICT, related_name="society", null=True, blank=True,
                                 verbose_name="Address")
+    comp_logo = models.ImageField(upload_to='logos/', height_field=None, width_field=None, max_length=200,
+                                  blank=True, null=True, verbose_name="Logo")
+
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True, blank=True)
 
@@ -77,7 +80,7 @@ class User(AbstractUser):
     admin = models.BooleanField(default=False, verbose_name="is admin")
     pro = models.BooleanField(default=False, verbose_name="is pro")
     phone = models.CharField(max_length=31, blank=True, null=True, verbose_name="Phone number")
-    picture = models.ImageField(upload_to='images/', height_field=None, width_field=None, max_length=100,
+    picture = models.ImageField(upload_to='avatars/', height_field=None, width_field=None, max_length=100,
                                 blank=True, null=True, verbose_name="Picture")
     first_login = models.BooleanField(default=True)
     preferred_language = models.ForeignKey(UserLanguages, on_delete=models.CASCADE, related_name='user_language',

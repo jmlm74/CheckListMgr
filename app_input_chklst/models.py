@@ -27,7 +27,7 @@ class Manager(models.Model):
     mgr_company = models.ForeignKey(Company, on_delete=models.SET_NULL, related_name="mgr_company", null=True)
     mgr_address = models.ForeignKey(Address, on_delete=models.SET_NULL, related_name="mgr_address",
                                     null=True, blank=True)
-    mgr_logo = models.ImageField(upload_to='images/', height_field=None, width_field=None, max_length=200,
+    mgr_logo = models.ImageField(upload_to='logos/', height_field=None, width_field=None, max_length=200,
                                  blank=True, null=True, verbose_name="Logo")
 
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
