@@ -2,80 +2,38 @@
 {% load dis_play %}
 {% load widget_tweaks %}
 <form method="post" action="" class="modal-form">
-  {% csrf_token %}
+    {% csrf_token %}
     <div class="modal-header">
         <h3>{% dis_play title %}</h3>
-        <span data-tooltip="{% dis_play 'Helpcreateaddr' %}"><i class="fas fa-question-circle"></i></span>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+            <span aria-hidden="true">+</span>
+        </button>
     </div>
 
     <div class="modal-body">
-        {% if form.non_field_errors %}
-            <div class="invalid mb-2">
-            <p class="error">
-                <ul class="errorslist">
-                    {% for error in form.non_field_errors %}<li>{% dis_play  error  %}</li>{% endfor %}
-                </ul>
-            </p>
-            </div>
-        {% endif %}
-
         <div class="form-group">
-                {% dis_play "Address_name" %}* : &nbsp; {{ form.address_name }} &nbsp;&nbsp;&nbsp;&nbsp;
-            <div class="{% if form.address_name.errors %} invalid{% endif %}">
-                {% for error in form.address_name.errors %}
-                    <p class="help-block error">{% dis_play error %}</p>
-                {% endfor %}
-            </div>
-
+            {% dis_play "Address_name" %}* : &nbsp; {{ form.address_name }} &nbsp;&nbsp;&nbsp;&nbsp;
         </div>
-        <p class="form-row">
+        <div class="form-group">
             {% dis_play "Street_number" %} :&nbsp;
             {{ form.street_number }}&nbsp;&nbsp;&nbsp;
             {% dis_play "Street_type" %} :&nbsp;
             {{ form.street_type }}
-            <div class="{% if form.street_number.errors %} invalid{% endif %}">
-                {% for error in form.street_number.errors %}
-                    <p class="help-block error">{% dis_play error %}</p>
-                {% endfor %}
-            </div>
-            <div class="{% if form.street_type.errors %} invalid{% endif %}">
-                {% for error in form.street_type.errors %}
-                    <p class="help-block error">{% dis_play error %}</p>
-                {% endfor %}
-            </div>
-        </p>
-
-        <div class="form-group">
-            {% dis_play "Address1" %} : {{ form.address1 }}
         </div>
         <div class="form-group">
-            {% dis_play "Address2" %} : {{ form.address2 }}
+            {% dis_play "Address1" %} : {% render_field form.address1|attr:"size:49" %}
         </div>
         <div class="form-group">
-            {% dis_play "Zipcode" %} : &nbsp;{{ form.zipcode }}&nbsp;&nbsp;
-            {% dis_play "City" %} : &nbsp;{{ form.city }}&nbsp;&nbsp;
-
-            <div class="{% if form.zipcode.errors %} invalid{% endif %}">
-                {% for error in form.zipcode.errors %}
-                    <p class="help-block error">{% dis_play error %}</p>
-                {% endfor %}
-            </div>
-            <div class="{% if form.city.errors %} invalid{% endif %}">
-                {% for error in form.city.errors %}
-                    <p class="help-block error">{% dis_play error %}</p>
-                {% endfor %}
-            </div>
+            {% dis_play "Address2" %} : {% render_field form.address2|attr:"size:49" %}
+        </div>
+        <div class=" row form-group">
+            <div class="col-4">{% dis_play "Zipcode" %} :</div>
+            <div class="col-8">{% dis_play "City" %} :</div>
+            <div class="col-4">{% render_field form.zipcode|attr:"size:8" %}</div>
+            <div class="col-8">&nbsp;{% render_field form.city|attr:"size:20" %}</div>
         </div>
         <div class="form-group">
-            {% dis_play "Country" %} : &nbsp;{{ form.country }}
-            <div class="{% if form.country.errors %} invalid{% endif %}">
-                {% for error in form.country.errors %}
-                    <p class="help-block error">{% dis_play error %}</p>
-                {% endfor %}
-            </div>
+            {% dis_play "Country" %} : &nbsp;{% render_field form.country|attr:"size:20" %}
         </div>
 
         <div class="modal-footer">

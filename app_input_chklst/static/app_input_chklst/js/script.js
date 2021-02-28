@@ -1,39 +1,56 @@
 /* *********************** */
 /* * Beginning Modal box * */
 /* *********************** */
-if (document.getElementById('id-mgrlogo')){
-    console.log("VUVUVUVU")
-    document.getElementById('id-mgrlogo').addEventListener("change", e => {
-        let logo_file = document.getElementById('logo').value;
-        console.log(logo_file);
-    });
-    document.getElementById('logo').addEventListener("change", e => {
-        let logo_file = document.getElementById('logo').value;
-        console.log(logo_file);
-    });
-}
-
 if ((document.getElementById('mgrmgmt')) || (document.getElementById('main'))) {    // manager page
 //JQuery is used for BSModal (Bootstrap)
     $(function () {
         console.log("Jquery loaded!!!!!")
-        console.log(formURL)
-        console.log(formURL2)
+        // console.log(formURL)
+        // console.log(formURL2)
         $("#create-mgr").modalForm({
-            formURL: formURL,
+            formURL: formURLCreate,
             modalID: "#create-modal-large"
         });
         $("#create-mat").modalForm({
-            formURL: formURL,
+            formURL: formURLCreate,
             modalID: "#create-modal"
         });
         $("#create-adr").modalForm({
-            formURL: formURL,
+            formURL: formURLCreate,
             modalID: "#create-modal-large"
         });
-        $("#create-line").modalForm({
-            formURL: formURL2,
-            modalID: "#create-modal"
+
+        /***********************************/
+        /* For compatibility with tables2  */
+        /* can't set redirection in table  */
+        /* --> build url here for bs-modal */
+        /***********************************/
+        // Display Manager
+        $(".Display-class").each(function () {
+            let url=formURLDisplay+$(this).attr('id');
+            url = url.slice(0,-1);  // remove last caracter idU to get the id
+            $(this).modalForm({
+                formURL: url,
+                modalID: "#create-modal"
+            });
+        });
+        // Update Manager
+        $(".Update-class").each(function () {
+            let url=formURLUpdate+$(this).attr('id');
+            url = url.slice(0,-1);  // remove last caracter idU to get the id
+            $(this).modalForm({
+                formURL: url,
+                modalID: "#create-modal"
+            });
+        });
+        // Remove manager
+        $(".Remove-class").each(function () {
+            let url=formURLRemove+$(this).attr('id');
+            url = url.slice(0,-1);  // remove last caracter idU to get the id
+            $(this).modalForm({
+                formURL: url,
+                modalID: "#create-modal"
+            });
         });
 
         $(".bs-modal-large").each(function () {

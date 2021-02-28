@@ -10,10 +10,12 @@ from app_input_chklst import materialviews as aicmatv
 app_name = 'app_input_chklst'
 urlpatterns = [
     # Main page for input Cheklists
-    path('maininput/', login_required(aicv.MainInputView.as_view()), name='inp-main'),
+    # path('maininput/', login_required(aicv.MainInputView.as_view()), name='inp-main'),
+    path('maininput/', login_required(aicv.mat_mgmt_view), name='inp-main'),
 
     # Managers
-    path('managermgmt/', login_required(aicmgrv.MgrMgmtView.as_view()), name='inp-mgrmgmt'),
+    path('managermgmt/', login_required(aicmgrv.mgr_mgmt_view), name='inp-mgrmgmt'),
+    path('managermgmt/', login_required(aicmgrv.mgr_mgmt_view), name='inp-mgrmgmt'),
     path('managercreate/<slug:return_url>', login_required(aicmgrv.ManagerCreateView.as_view()), name='inp-mgrcreate'),
     path('managercreate/', login_required(aicmgrv.ManagerCreateView.as_view()), name='inp-mgrcreate'),
     path('managerdisplay/<int:pk>', login_required(aicmgrv.ManagerDisplayView.as_view()), name='inp-mgrdisplay'),
@@ -21,7 +23,7 @@ urlpatterns = [
     path('managerdelete/<int:pk>', login_required(aicmgrv.ManagerDeleteView.as_view()), name='inp-mgrdelete'),
 
 # Adresses
-    path('addressmgmt/', login_required(aicaddrv.AddressMgmtView.as_view()), name='inp-addrmgmt'),
+    path('addressmgmt/', login_required(aicaddrv.addr_mgmt_view), name='inp-addrmgmt'),
     path('addresscreate/', login_required(aicaddrv.AddressCreateView.as_view()), name='inp-addrcreate'),
     path('addressdisplay/<int:pk>', login_required(aicaddrv.AddressDisplayView.as_view()), name='inp-addrdisplay'),
     path('addressupdate/<int:pk>', login_required(aicaddrv.AddressUpdateView.as_view()), name='inp-addrupdate'),

@@ -1,6 +1,10 @@
+import itertools
+
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalReadView, BSModalUpdateView, BSModalDeleteView
 from django.utils.datastructures import MultiValueDictKeyError
-from sortable_listview import SortableListView
+from django.utils.html import format_html
+from django_tables2 import tables, A, RequestConfig
+from django_filters import FilterSet, CharFilter
 
 from django.contrib import messages
 from django.db.models import Q, RestrictedError
@@ -9,37 +13,96 @@ from django.urls import reverse_lazy
 
 from app_input_chklst.forms import ManagerCreateForm
 from app_input_chklst.models import Manager
+from app_utilities.models import Translation
+from app_utilities.views import render_col_del_generic, render_enable_generic
 
 
-class MgrMgmtView(SortableListView):
+class AddressFilter(FilterSet):
+    mgr_name = CharFilter(field_name='mgr_name', lookup_expr='icontains')
+    mgr_contact = CharFilter(field_name='mgr_contact', lookup_expr='icontains')
+    mgr_email1 = CharFilter(field_name='mgr_email1', lookup_expr='icontains')
+    mgr_company = CharFilter(field_name='mgr_company', lookup_expr='icontains')
+
+    class Meta:
+        model = Manager
+        fields = ['mgr_name', 'mgr_contact', 'mgr_email1', 'mgr_company',]
+
+
+def mgr_mgmt_view(request):
     """
-    List managers --> list sortable
+    view to call tables2 MgrMgmtTable
+    could be a Listview - Maybe later
     """
-    context = {'title': 'Managers'}
-    template_name = "app_input_chklst/managermgmt.html"
-    context_object_name = "managers"
-    allowed_sort_fields = {"mgr_name": {'default_direction': '', 'verbose_name': 'Manager'},
-                           "mgr_contact": {'default_direction': '', 'verbose_name': 'Contactname'},
-                           "mgr_phone": {'default_direction': '', 'verbose_name': 'Phone'},
-                           "mgr_email1": {'default_direction': '', 'verbose_name': 'Email1'},
-                           "mgr_email2": {'default_direction': '', 'verbose_name': 'Email2'},
-                           "mgr_enable": {'default_direction': '', 'verbose_name': 'Enable'}, }
-    default_sort_field = 'mgr_name'  # mandatory
-    paginate_by = 5
-
-    def get_queryset(self):
-        order = self.request.GET.get('sort', 'mgr_name')
-
-        if self.request.user.is_superuser:
-            return Manager.objects.all().order_by(order)
+    context = {'title': "Managers"}
+    if request.method == 'POST':
+        return render(request, "app_input_chklst/managermgmt.html", context=context)
+    if request.method == 'GET':
+        list(messages.get_messages(request))
+        # get Check-lists & Check-lists done
+        if request.user.is_superuser:
+            managers = Manager.objects.all().order_by('mgr_name')
         else:
-            return Manager.objects.filter(Q(mgr_company=self.request.user.user_company)).order_by(order)
+            managers = Manager.objects.filter(mgr_company=request.user.user_company).order_by('mgr_name')
+        myfilter = AddressFilter(request.GET, queryset=managers)
+        managers = myfilter.qs
+        mgr_table = MgrMgmtTable(managers,
+                                 request.user.preferred_language.code,
+                                 request.user.pro, prefix="1-")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['sort'] = self.request.GET.get('sort', 'mgr_name')
-        context['title'] = 'Managers'
-        return context
+        RequestConfig(request, paginate={"per_page": 5}).configure(mgr_table)
+        context['mgrtable'] = mgr_table
+        context['myfilter'] = myfilter
+        return render(request, "app_input_chklst/managermgmt.html", context=context)
+
+
+class MgrMgmtTable(tables.Table):
+    """
+        Django tables2 for managers
+        1st init columns --> attr class for css (witdh)
+        __init__ --> define the headers. Because the translation : not in 1st init !
+        render_cols for specificities of each col --> generic cols are in utilities
+        The dialogboxes are launched via JS
+    """
+    counter = tables.columns.Column(empty_values=(), orderable=False, verbose_name="#",
+                                    attrs={'td': {'class': 'mgr_counter_col'}})
+    col_del = tables.columns.Column(empty_values=(),
+                                    orderable=False,
+                                    verbose_name="",
+                                    attrs={'td': {'class': 'mgr_col_del_col'}})
+    mgr_name = tables.columns.Column(attrs={'td': {'class': 'mgr_name_col'}})
+    mgr_contact = tables.columns.Column(attrs={'td': {'class': 'mgr_contact_col'}})
+    mgr_phone = tables.columns.Column(attrs={'td': {'class': 'mgr_phone_col'}})
+    mgr_email1 = tables.columns.Column(attrs={'td': {'class': 'mgr_email_col'}})
+    mgr_email2 = tables.columns.Column(attrs={'td': {'class': 'mgr_email_col'}})
+    mgr_enable = tables.columns.Column(attrs={'td': {'class': 'mgr_enable_col'}})
+
+    class Meta:
+        model = Manager
+        fields = ('counter', 'mgr_name', 'mgr_contact', 'mgr_phone', 'mgr_email1', 'mgr_email2',
+                  'mgr_enable', 'col_del')
+        attrs = {'class': 'table table-striped table-hover'}
+
+    def __init__(self, *args, **kwargs):
+        self.row_counter = itertools.count()
+        self.base_columns['mgr_name'].verbose_name = Translation.get_translation('Manager', language=args[1])
+        self.base_columns['mgr_contact'].verbose_name = Translation.get_translation('Contactname', language=args[1])
+        self.base_columns['mgr_phone'].verbose_name = Translation.get_translation('Phone', language=args[1])
+        self.base_columns['mgr_email1'].verbose_name = Translation.get_translation('Email1', language=args[1])
+        self.base_columns['mgr_email2'].verbose_name = Translation.get_translation('Email2', language=args[1])
+        self.base_columns['mgr_enable'].verbose_name = Translation.get_translation('Enable', language=args[1])
+        super(MgrMgmtTable, self).__init__(*args, **kwargs)
+
+    def render_counter(self):
+        self.row_counter = getattr(self, 'row_counter', itertools.count())
+        return next(self.row_counter) + 1
+
+    def render_col_del(self, *args, **kwargs):
+        var = render_col_del_generic(str(kwargs['record'].pk), self.request.user)
+        return format_html(var)
+
+    def render_mgr_enable(self, *args, **kwargs):
+        var = render_enable_generic(kwargs['value'])
+        return format_html(var)
 
 
 class ManagerCreateView(BSModalCreateView):
@@ -118,6 +181,7 @@ class ManagerUpdateView(BSModalUpdateView):
                 save_manager(manager, form)
         return super().post(request, *args, **kwargs)
 
+
 class ManagerDeleteView(BSModalDeleteView):
     """
     Manager Delete --> modal delete view
@@ -127,6 +191,11 @@ class ManagerDeleteView(BSModalDeleteView):
     success_message = 'DeletemgrOK'
     error_message = 'DeletemgrKO'
     success_url = reverse_lazy('app_input_chklst:inp-mgrmgmt')
+
+    def get_context_data(self, *arks, **kwargs):
+        context = super(ManagerDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Deletemgr"
+        return context
 
     def post(self, request, *args, **kwargs):
         try:

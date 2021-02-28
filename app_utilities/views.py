@@ -43,3 +43,30 @@ def get_address(request):
             address = serializers.serialize("json", address)
             data = {'address': address, 'data': 'OK'}
     return JsonResponse(data)
+
+
+def render_col_del_generic(pk, user):
+    """
+    render col (eye-edit-trash) for tables2
+    """
+    tooltip = Translation.get_translation("Display", username=user)
+    var = '<span data-tooltip="' + tooltip + '" class="Display-class" id="' + pk + 'D">' \
+          '<i class="tabicon fas fa-eye mr-2" style="color: forestgreen; !important"></i>' \
+          '</span>'
+    tooltip = Translation.get_translation("Update", username=user)
+    var += '<span data-tooltip="' + tooltip + '" class="Update-class" id="' + pk + 'U">' \
+           '<i class="tabicon fas fa-edit mr-2" style="color: dodgerblue;"></i>' \
+           '</span>'
+    tooltip = Translation.get_translation("Delete", username=user)
+    var += '<span data-tooltip="' + tooltip + '" class="Remove-class" id="' + pk + 'R">' \
+           '<i class="tabicon fas fa-trash-alt" style="color: red;"></i>' \
+           '</span>'
+    return var
+
+
+def render_enable_generic(value):
+    if value:
+        var = '<i class="fas fa-check" style="color: green" > </i>'
+    else:
+        var = '<i class="fas fa-times" style="color: red" > </i>'
+    return var

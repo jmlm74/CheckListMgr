@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_extensions',
     'crispy_forms',
+    'django_filters',
 
     'app_utilities.apps.AppUtilitiesConfig',
     'app_user.apps.AppUserConfig',

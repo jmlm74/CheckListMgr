@@ -44,10 +44,6 @@ class MaterialDisplayView(BSModalReadView):
     """
     model = Material
     template_name = 'app_input_chklst/dialogboxes/displaymaterial.html'
-    # mat2 = Material.objects.filter(mat_secondary__mat_material=mat)
-
-
-
 
     def get_context_data(self, **kwargs):
         context = super(MaterialDisplayView, self).get_context_data(**kwargs)
@@ -94,3 +90,7 @@ class MaterialDeleteView(BSModalDeleteView):
             messages.error(request, self.error_message)
         return redirect(self.success_url)
 
+    def get_context_data(self, *arks, **kwargs):
+        context = super(MaterialDeleteView, self).get_context_data(**kwargs)
+        context['title'] = "Deletemat"
+        return context

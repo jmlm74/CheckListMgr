@@ -1,3 +1,31 @@
 /* app_input_chklst */
 
+/* manager table */
+.mgr_counter_col,.addr_counter_col,.mat_counter_col{
+  width: 4%;
+  max-width: 4%;
+}
+.mgr_name_col,.mgr_contact_col,.mgr_email_col,.mat_manager_col{
+  width: 18%;
+  max-width: 18%;
+}
+.mgr_phone_col,.addr_zip_col,.addr_type_col,.mat_type_col,.mat_model_col,.mat_material_col{
+  width: 10%;
+  max-width: 10%;
+}
+.mgr_enable_col,.addr_num_col,.mat_enable_col{
+  width: 4%;
+  max-width: 4%;
+}
+.mgr_col_del_col,.addr_col_del_col{
+  width: 20%;
+}
+.addr_name_col,.addr_addr1_col,.addr_addr2_col,.addr_city_col,.mat_designation_col,.mat_registration_col{
+  width: 15%;
+  max-width: 15%;
+}
+.table-container{
+  min-width: 100%;
+}
+
 /* End app_input_chklst */

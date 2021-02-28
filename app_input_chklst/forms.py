@@ -53,9 +53,8 @@ class ManagerCreateForm(BSModalModelForm):
             photo_data = BytesIO(logo.read())
             image = Image.open(photo_data)
             width, height = image.size
-            if width > 600 or height > 600:
+            if width > 1000 or height > 1000:
                 raise forms.ValidationError("Big_image")
-            print('OK')
             return logo
         else:
             return ''
