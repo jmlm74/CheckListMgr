@@ -5,8 +5,6 @@ if ((document.getElementById('mgrmgmt')) || (document.getElementById('main'))) {
 //JQuery is used for BSModal (Bootstrap)
     $(function () {
         console.log("Jquery loaded!!!!!")
-        // console.log(formURL)
-        // console.log(formURL2)
         $("#create-mgr").modalForm({
             formURL: formURLCreate,
             modalID: "#create-modal-large"
@@ -20,38 +18,7 @@ if ((document.getElementById('mgrmgmt')) || (document.getElementById('main'))) {
             modalID: "#create-modal-large"
         });
 
-        /***********************************/
-        /* For compatibility with tables2  */
-        /* can't set redirection in table  */
-        /* --> build url here for bs-modal */
-        /***********************************/
-        // Display Manager
-        $(".Display-class").each(function () {
-            let url=formURLDisplay+$(this).attr('id');
-            url = url.slice(0,-1);  // remove last caracter idU to get the id
-            $(this).modalForm({
-                formURL: url,
-                modalID: "#create-modal"
-            });
-        });
-        // Update Manager
-        $(".Update-class").each(function () {
-            let url=formURLUpdate+$(this).attr('id');
-            url = url.slice(0,-1);  // remove last caracter idU to get the id
-            $(this).modalForm({
-                formURL: url,
-                modalID: "#create-modal"
-            });
-        });
-        // Remove manager
-        $(".Remove-class").each(function () {
-            let url=formURLRemove+$(this).attr('id');
-            url = url.slice(0,-1);  // remove last caracter idU to get the id
-            $(this).modalForm({
-                formURL: url,
-                modalID: "#create-modal"
-            });
-        });
+        // ICI BS_Modal
 
         $(".bs-modal-large").each(function () {
             $(this).modalForm(

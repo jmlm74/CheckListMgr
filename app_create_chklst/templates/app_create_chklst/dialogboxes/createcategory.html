@@ -4,9 +4,8 @@
   {% csrf_token %}
     <div class="modal-header">
         <h3>{% dis_play "Createcat" %}</h3>
-        <span data-tooltip="{% dis_play 'Helpcreatecat' %}"><i class="fas fa-question-circle"></i></span>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
+      <span aria-hidden="true">+</span>
     </button>
     </div>
 
@@ -30,9 +29,12 @@
                     <p class="help-block error">{% dis_play error %}</p>
                 {% endfor %}
             </div>
-
         </div>
-       <p class="form-group">
+        <p class="form-group">
+            {% dis_play "Heading" %}* :<br/>
+            {{ form.cat_heading }}
+        </p>
+        <p class="form-group">
             {% dis_play "Wording" %}* :<br/>
             {{ form.cat_wording }}
             <span data-tooltip="{% dis_play 'Helpcreatecatdesc' %}"><i class="fas fa-question-circle"></i></span>

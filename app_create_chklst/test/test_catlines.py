@@ -4,9 +4,9 @@ from django.test import TestCase, Client, TransactionTestCase, RequestFactory
 from django.urls import reverse, resolve
 
 from app_create_chklst.forms import CategoryModelForm
-from app_create_chklst.views import CategoryCreateView, LineCreateView, CategoryUpdateView, LineUpdateView, \
-    CategoryDeleteView, LineDeleteView, CategoryDisplayView, LineDisplayView, CatandLineMgmtView, CategoryMgmtView, \
-    LineMgmtView
+from app_create_chklst.line_views import LineUpdateView, LineDeleteView, LineDisplayView, LinesMgmtTable
+from app_create_chklst.views import CategoryCreateView, LineCreateView, CategoryUpdateView, \
+    CategoryDeleteView,  CategoryDisplayView, CatandLineMgmtView, CategoryMgmtView
 from app_user.models import User, Company
 from app_create_chklst.models import Category, Line
 
@@ -410,7 +410,8 @@ class test_VIEW_GET_Method(TransactionTestCase):
         """
         print(inspect.currentframe().f_code.co_name)
         request = RequestFactory().get('/')
-        view = LineMgmtView()
+        # view = LineMgmtView()
+        view = LinesMgmtTable
         view.setup(request)
         request.session = self.c.session
         request.user = self.user

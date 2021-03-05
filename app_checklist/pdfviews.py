@@ -84,8 +84,12 @@ def send_mail(request, newchecklist, result, mgr):
         zipcity = str(newchecklist.cld_company.address.zipcode) + " " + \
                   str(newchecklist.cld_company.address.city) + " - " + \
                   str(newchecklist.cld_company.address.country)
+        if newchecklist.cld_material:
+            material = newchecklist.cld_material.mat_designation
+        else:
+            material = " "
         c = {
-            "material": newchecklist.cld_material.mat_designation,
+            "material": material,
             'society': newchecklist.cld_company.company_name,
             'society1': society1,
             'society2': newchecklist.cld_company.address.address2,

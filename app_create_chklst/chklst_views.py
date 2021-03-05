@@ -1,5 +1,6 @@
 import json
 
+from django_filters import FilterSet, CharFilter
 from sortable_listview import SortableListView
 from bootstrap_modal_forms.generic import BSModalDeleteView, BSModalReadView, BSModalFormView
 
@@ -153,6 +154,17 @@ def create_chklst_fct(request, request_data):
     except KeyError:
         pass
     return data
+"""
+class lineFilter(FilterSet):
+    mgr_name = CharFilter(field_name='mgr_name', lookup_expr='icontains')
+    mgr_contact = CharFilter(field_name='mgr_contact', lookup_expr='icontains')
+    mgr_email1 = CharFilter(field_name='mgr_email1', lookup_expr='icontains')
+    mgr_company = CharFilter(field_name='mgr_company', lookup_expr='icontains')
+
+    class Meta:
+        model = Line
+        fields = ['mgr_name', 'mgr_contact', 'mgr_email1', 'mgr_company',]
+"""
 
 # noinspection PyTypeChecker
 class ChkLstCreateView(View):

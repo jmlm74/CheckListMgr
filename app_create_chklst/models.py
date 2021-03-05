@@ -15,6 +15,40 @@ line-key or category-key
 """
 
 
+class Heading(models.Model):
+    """
+    Heading model
+    Headings for lines and categories --> used for filtering
+    """
+
+    head_key = models.CharField(max_length=30, verbose_name='head key')
+
+    head_company = models.ForeignKey(Company,
+                                     related_name='heading',
+                                     on_delete=models.CASCADE,
+                                     blank=True,
+                                     null=True,
+                                     default=None)
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+
+    class Meta:
+        verbose_name = 'Heading'
+        verbose_name_plural = 'Headings'
+        constraints = [
+            UniqueConstraint(fields=['head_key', ], name='Unique heading'),
+        ]
+        ordering = ['head_key', ]
+        indexes = [
+            models.Index(fields=['head_key'], name='I_Headings'),
+        ]
+
+    def __str__(self):
+        return self.head_key
+
+
 class Line(models.Model):
     """
     Line Model
@@ -31,10 +65,16 @@ class Line(models.Model):
                                  verbose_name="Line Type",
                                  choices=LineType.choices,
                                  default=LineType.CHOICE)
+
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
 
     line_company = models.ForeignKey(Company, related_name='line', on_delete=models.CASCADE)
+    line_heading = models.ForeignKey(Heading,
+                                     related_name='line_heading',
+                                     null=True,
+                                     blank=True,
+                                     on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = 'Line'
@@ -63,6 +103,11 @@ class Category(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     cat_company = models.ForeignKey(Company, related_name='category', on_delete=models.CASCADE, blank=True)
+    cat_heading = models.ForeignKey(Heading,
+                                     related_name='cat_heading',
+                                     null=True,
+                                     blank=True,
+                                     on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = 'Category'

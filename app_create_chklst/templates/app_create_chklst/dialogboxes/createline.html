@@ -1,28 +1,28 @@
 {% load dis_play %}
 {% load widget_tweaks %}
 <form method="post" action="">
-  {% csrf_token %}
+    {% csrf_token %}
     <div class="modal-header">
         <h3>{% dis_play "Createline" %}</h3>
-        <span data-tooltip="{% dis_play 'Helpcreatelin' %}"><i class="fas fa-question-circle"></i></span>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+            <span aria-hidden="true">+</span>
+        </button>
     </div>
 
     <div class="modal-body">
         {% if form.non_field_errors %}
             <div class="invalid mb-2">
-            <p class="error">
+                <p class="error">
                 <ul class="errorslist">
-                    {% for error in form.non_field_errors %}<li>{% dis_play  error  %}</li>{% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{% dis_play error %}</li>{% endfor %}
                 </ul>
-            </p>
+                </p>
             </div>
         {% endif %}
 
         <div class="form-group">
-            {% dis_play "Key" %}* :<br />
+            {% dis_play "Key" %}* :<br/>
             {{ form.line_key }}
             <span data-tooltip="{% dis_play 'Helpcreatelinkey' %}"><i class="fas fa-question-circle"></i></span>
             <div class="{% if form.line_key.errors %} invalid{% endif %}">
@@ -30,27 +30,31 @@
                     <p class="help-block error">{% dis_play error %}</p>
                 {% endfor %}
             </div>
-
         </div>
-       <p class="form-group">
+        <p class="form-group">
+            {% dis_play "Heading" %}* :<br/>
+            {{ form.line_heading }}
+        </p>
+        <p class="form-group">
             {% dis_play "Wording" %}* :<br/>
             {{ form.line_wording }}
             <span data-tooltip="{% dis_play 'Helpcreatelindesc' %}"><i class="fas fa-question-circle"></i></span>
-            <div class="{% if form.line_wording.errors %} invalid{% endif %}">
-                {% for error in form.line_wording.errors %}
-                    <p class="help-block error">{% dis_play error %}</p>
-                {% endfor %}
-            </div>
+        <div class="{% if form.line_wording.errors %} invalid{% endif %}">
+            {% for error in form.line_wording.errors %}
+                <p class="help-block error">{% dis_play error %}</p>
+            {% endfor %}
+        </div>
         </p>
         <div class="form-group">
-            {% dis_play "Linetype" %}* : <span data-tooltip="{% dis_play 'Helpcreatelintyp' %}"><i class="fas fa-question-circle"></i></span><br/>
+            {% dis_play "Linetype" %}* : <span data-tooltip="{% dis_play 'Helpcreatelintyp' %}"><i
+                class="fas fa-question-circle"></i></span><br/>
             {{ form.line_type }}
 
         </div>
         {% if user.is_superuser %}
-        <div class="form-group">
-            {% dis_play "Company" %}* : {{ form.line_company }}
-        </div>
+            <div class="form-group">
+                {% dis_play "Company" %}* : {{ form.line_company }}
+            </div>
         {% endif %}
         <div class="form-group">
             {% dis_play "Enable" %}* : {{ form.line_enable }}

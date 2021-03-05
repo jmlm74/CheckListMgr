@@ -2,19 +2,50 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load dis_play %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
 {% block body_block %}
-<div class="my_body" id="catandlinemgmt">
-    {% include "partials/_modal.html" %}
-
-    <div class="container">
-        {% include 'partials/_title.html' %}
-        {% include "app_create_chklst/partials/_linetable.html" %}
-        {% include 'partials/_back.html' %}
+    <div class="my_body" id="catandlinemgmt">
+        {% include "partials/_modal.html" %}
+        <div class="container">
+            {% include 'partials/_title.html' %}
+            <div class="row mt-3">
+                <div class="col-5 col-md-2">
+                    <h3>{% dis_play "Lines" %}</h3>
+                </div>
+                <div class="col-4 col-md-2">
+                    <button id="create-heading" class="btn btn-primary" type="button" name="button">
+                        <i class="fa fa-plus mr-2"></i>{% dis_play "Create" %}
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 d-flex justify-content-end mt-3 mb-3">
+                    <form method="get">
+                        {% dis_play "Heading" %} : {% render_field myfilter.form.line_heading|attr:"size:1" %}
+                        {% dis_play "Key" %} : {% render_field myfilter.form.line_key|attr:"size:15" %}
+                        {% dis_play "Wording" %} : {% render_field myfilter.form.line_wording|attr:"size:15" %}
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="align-items-top justify-content-center text-center col-12 small">
+                    {% render_table linetable %}
+                    {% include 'partials/_back.html' %}
+                </div>
+            </div>
+            {% include 'partials/_back.html' %}
+        </div>
     </div>
-</div>
-<script>
-const formURL = "{%  url 'app_create_chklst:chk-catcreate' %}"
-const formURL2 = "{%  url 'app_create_chklst:chk-linecreate' %}"
-const returnURL = "{% url 'app_create_chklst:chk-linemgmt' %}"
-</script>
+    <script>
+        const formURL= ""
+        const formURL2= ""
+        const formURLCreate = "{%  url 'app_create_chklst:chk-linecreate' %}"
+        {#  the 0 at the end --> avoid 2 urls with and without parameters #}
+        const formURLDisplay = "{%  url 'app_create_chklst:chk-linedisplay' 0 %}"
+        const formURLUpdate = "{%  url 'app_create_chklst:chk-lineupdate' 0 %}"
+        const formURLRemove = "{%  url 'app_create_chklst:chk-linedelete' 0 %}"
+        const returnURL = "{% url 'app_create_chklst:chk-linemgmt' %}"
+    </script>
 {% endblock body_block %}

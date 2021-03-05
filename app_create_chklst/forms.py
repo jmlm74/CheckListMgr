@@ -1,7 +1,7 @@
 from bootstrap_modal_forms.forms import BSModalModelForm, BSModalForm
 from django import forms
 
-from app_create_chklst.models import Category, Line, CheckList
+from app_create_chklst.models import Category, Line, CheckList, Heading
 from app_user.models import Company
 
 
@@ -87,3 +87,25 @@ class CheckListCopyForm(BSModalForm):
             raise forms.ValidationError('Operation_canceled')
         return self.cleaned_data
 
+
+class HeadingModelForm(BSModalModelForm):
+    """
+    Heading creation form
+    """
+    head_key = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'size': '20'}))
+    head_company = forms.ModelChoiceField(queryset=Company.objects.all().order_by('company_name'),
+                                          initial="-------")
+
+    class Meta:
+        model = Heading
+        fields = ['head_key', 'head_company']
+
+    def __init__(self, *args, **kwargs):
+        super(HeadingModelForm, self).__init__(*args, **kwargs)
+        self.fields['head_company'].required = False
+    
+    def clean(self):
+        super(HeadingModelForm, self).clean()
+        if not self.cleaned_data['head_company']:
+            self.cleaned_data['head_company'] = self.request.user.user_company
+        return self.cleaned_data

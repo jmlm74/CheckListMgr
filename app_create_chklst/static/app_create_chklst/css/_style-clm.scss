@@ -65,4 +65,41 @@
       max-height: 5em;
   }
 
+  select{
+    overflow: scroll;
+}
+
+/* tables */
+.line_counter_col{
+  width: 5%;
+}
+.line_col_del_col,.cat_col_del_col{
+  width: 20%;
+}
+.line_key_col,.cat_heading_col{
+  width: 20%;
+  max-width: 20%;
+}
+.line_wording_col,.cat_wording_col{
+  width: 30%;
+  max-width: 30%;
+}
+.line_enable_col,.cat_enable_col{
+  width: 4%;
+  max-width: 4%;
+}
+.line_type_col{
+  width: 6%;
+  max-width: 6%;
+}
+.line_heading_col,.cat_heading_col{
+  width: 15%;
+  max-width: 15%;
+}
+.table-container{
+  min-width: 100%;
+}
+/* end tables */
+
+
 /* End app_create_chklst */  

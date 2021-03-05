@@ -1,0 +1,23 @@
+{% load dis_play %}
+{% load widget_tweaks %}
+<div class="modal-header">
+    <h3>{% dis_play "Displayheading" %}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+  <span aria-hidden="true">+</span>
+</button>
+</div>
+
+<div class="modal-body">
+    <div class="form-group">
+        {% dis_play "Heading" %}* : {{ heading.head_key }}
+    </div>
+    {% if user.is_superuser %}
+    <div class="form-group">
+        {% dis_play "Company" %}* : {{ form.head_company }}
+    </div>
+    {% endif %}
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">{% dis_play "Close" %}</button>
+    </div>
+</div>
