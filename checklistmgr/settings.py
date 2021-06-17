@@ -216,3 +216,6 @@ COMPRESS_ROOT = STATIC_DIR
 
 # tables2
 DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4.html"
+
+# django 3.2 migrations
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
