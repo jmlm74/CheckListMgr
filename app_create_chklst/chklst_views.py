@@ -59,6 +59,7 @@ class ChklstDisplayView(BSModalReadView):
         :return: template modal
         """
         pk = kwargs['pk']
+        print(f"coucou {pk}")
         checklist = CheckList.objects.get(pk=pk)
         details = checklist.chklst_detail()
         self.context['details'] = details
