@@ -17,7 +17,8 @@ from app_create_chklst.models import (Category,
                                       CheckListLine,
                                       CheckListCategory,
                                       CheckList,
-                                      Line)
+                                      Line,
+                                      Heading)
 from app_user.models import Company
 
 
@@ -155,17 +156,7 @@ def create_chklst_fct(request, request_data):
     except KeyError:
         pass
     return data
-"""
-class lineFilter(FilterSet):
-    mgr_name = CharFilter(field_name='mgr_name', lookup_expr='icontains')
-    mgr_contact = CharFilter(field_name='mgr_contact', lookup_expr='icontains')
-    mgr_email1 = CharFilter(field_name='mgr_email1', lookup_expr='icontains')
-    mgr_company = CharFilter(field_name='mgr_company', lookup_expr='icontains')
 
-    class Meta:
-        model = Line
-        fields = ['mgr_name', 'mgr_contact', 'mgr_email1', 'mgr_company',]
-"""
 
 # noinspection PyTypeChecker
 class ChkLstCreateView(View):
@@ -188,6 +179,7 @@ class ChkLstCreateView(View):
                 .order_by('cat_key')
             lines = Line.objects.filter(Q(line_company=request.user.user_company) & Q(line_enable=True))\
                 .order_by('line_key')
+        self.context['headings'] = Heading.objects.all()
         self.context['categories'] = categories
         self.context['lines'] = lines
         self.context['form'] = self.form
@@ -229,6 +221,7 @@ class ChkLstUpdateView(View):
         self.context['lines'] = lines
         
         details = checklist.chklst_detail()
+        self.context['headings'] = Heading.objects.all()
         self.context['details'] = details
         self.context['checklist'] = checklist
         self.context['form'] = self.form(initial={'chk_key': checklist.chk_key,

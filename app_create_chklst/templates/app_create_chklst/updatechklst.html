@@ -15,21 +15,30 @@
                 <form method="post" enctype="multipart/form-data" action="" id="myform">
                     {% csrf_token %}
                     <div class="row form-row mt-2 mb-5">
-                    <div class="col-sm-3">
-                        {% dis_play "Key" %}* : {% render_field form.chk_key|append_attr:"readonly:readonly" %}
-                    </div>
-                    <div class="col-sm-8">
-                        {% dis_play "Description" %}* : {{ form.chk_title }}
-                        &nbsp;
-                        {% if user.is_superuser %}
-                            {% dis_play "Company" %}* : {{ form.chk_company }}
+                        <div class="col-sm-3">
+                            {% dis_play "Key" %}* : {% render_field form.chk_key|append_attr:"readonly:readonly" %}
+                        </div>
+                        <div class="col-sm-8">
+                            {% dis_play "Description" %}* : {{ form.chk_title }}
                             &nbsp;
-                        {% endif %}
-                        {% dis_play "Enable" %}* : {{ form.chk_enable }}
+                            {% if user.is_superuser %}
+                                {% dis_play "Company" %}* : {{ form.chk_company }}
+                                &nbsp;
+                            {% endif %}
+                            {% dis_play "Enable" %}* : {{ form.chk_enable }}
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="button" id="submit-btn" class="btn btn-primary">{% dis_play "Update" %}</button>
+                        </div>
                     </div>
-                    <div class="col-sm-1">
-                        <button type="button" id="submit-btn" class="btn btn-primary">{% dis_play "Update" %}</button>
-                    </div>
+                    <div class="row mt-2 mb-3 ml-2">
+                        {% dis_play "Heading" %} :
+                        <select id="select_heading" title="{% dis_play "Heading" %}" class="ml-1" >
+                            <option value="0">All</option>
+                            {% for heading in headings  %}
+                                <option value="{{ heading.id }}">{{ heading.head_key }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </form>
 
@@ -45,7 +54,7 @@
                                 {% for category in categories %}
                                     {% find_value_in_listdict category.cat_wording details as catfind %}
                                     {% if not catfind %}
-                                        <div class="list-item  cat-item overflow-auto" id="cat-{{ category.pk }}" draggable="true">
+                                        <div class="list-item  cat-item overflow-auto heading_{{ category.cat_heading.id }}" id="cat-{{ category.pk }}" draggable="true">
                                             <span class="text-center"> {{ category.cat_key }}</span>
                                             <span>- {{ category.cat_wording|truncatechars:20 }}</span>
                                         </div>
@@ -62,7 +71,7 @@
                             {% for line in lines %}
                                 {% find_value_in_listdict line.line_wording details as linefind %}
                                 {% if not linefind %}
-                                    <div class="list-item line-item overflow-auto"  id="lin-{{ line.pk }}" draggable="true">
+                                    <div class="list-item line-item overflow-auto heading_{{ line.line_heading.id }}"  id="lin-{{ line.pk }}" draggable="true">
                                         <span class="text-center"> {{ line.line_key }}</span>
                                         <span>- {{ line.line_wording|truncatechars:20 }} - {{ line.line_type }}</span>
                                     </div>
