@@ -1,6 +1,57 @@
 import {SendAjax, getCookie, test2} from '../../../../static/js/modul.js'
 
 
+// Declaration fonction qui permet d'intialiser le DOM pour le dragndrop
+let dragndrop = () =>{
+    if (document.querySelector('.dragndrop')) {
+    /* ***************************** */
+    /* * Beginning for drag-n-drop * */
+    /* ***************************** */
+        const draggables = document.querySelectorAll('.list-item')
+        const containers = document.querySelectorAll('.list')
+
+        draggables.forEach(draggable => {
+          draggable.addEventListener('dragstart', () => {
+            draggable.classList.add('dragging')
+          })
+
+          draggable.addEventListener('dragend', () => {
+            draggable.classList.remove('dragging')
+          })
+        })
+
+        containers.forEach(container => {
+          container.addEventListener('dragover', e => {
+            e.preventDefault()
+            const afterElement = getDragAfterElement(container, e.clientY)
+            const draggable = document.querySelector('.dragging')
+            if (afterElement == null) {
+              container.appendChild(draggable)
+            } else {
+              container.insertBefore(draggable, afterElement)
+            }
+          })
+        })
+
+        function getDragAfterElement(container, y) {
+          const draggableElements = [...container.querySelectorAll('.list-item:not(.dragging)')]
+
+          return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect()
+            const offset = y - box.top - box.height / 2
+            if (offset < 0 && offset > closest.offset) {
+              return { offset: offset, element: child }
+            } else {
+              return closest
+            }
+          }, { offset: Number.NEGATIVE_INFINITY }).element
+        }
+    /* *********************** */
+    /* * End for drag-n-drop * */
+    /* *********************** */
+    }
+}
+
 /***************************/
 /* create/update checklist */
 /***************************/
@@ -12,90 +63,34 @@ if ((document.getElementById('createchklst'))||(document.getElementById('updatec
     const my_lines = document.getElementById("lines")
 
     select_heading.addEventListener('change', e => {
-       let x = select_heading.value;
-       let my_class = `heading_${x}`;
-       let all_categories = my_categories.querySelectorAll(":scope > .cat-item");
-       let all_lines = my_lines.querySelectorAll(":scope > .line-item");
-       if (x == "0"){
+        let x = select_heading.value;
+        let my_class = `heading_${x}`;
+        let all_categories = my_categories.querySelectorAll(":scope > .cat-item");
+        let all_lines = my_lines.querySelectorAll(":scope > .line-item");
+        if (x == "0"){
            all_categories.forEach( elt => elt.style.visibility = "visible");
            all_lines.forEach( elt => elt.style.visibility = "visible");
            return;
-       }
-       let my_selected_categories =  my_categories.querySelectorAll(":scope > ."+my_class);
-       let my_selected_lines =  my_lines.querySelectorAll(":scope > ."+my_class);
-       all_categories.forEach( elt => elt.style.visibility = "hidden");
-       my_selected_categories.forEach(elt => {
+        }
+        let my_selected_categories =  my_categories.querySelectorAll(":scope > ."+my_class);
+        let my_selected_lines =  my_lines.querySelectorAll(":scope > ."+my_class);
+        all_categories.forEach( elt => elt.style.visibility = "hidden");
+        my_selected_categories.forEach(elt => {
            elt.style.visibility = "visible";
            let cloned_elt = elt.cloneNode(true);
            my_categories.insertBefore(cloned_elt, my_categories.firstChild);
            my_categories.removeChild(elt);
-       })
-       all_lines.forEach( elt => elt.style.visibility = "hidden");
-       my_selected_lines.forEach(elt => {
+        })
+        all_lines.forEach( elt => elt.style.visibility = "hidden");
+        my_selected_lines.forEach(elt => {
            elt.style.visibility = "visible";
            let cloned_elt = elt.cloneNode(true);
            my_lines.insertBefore(cloned_elt, my_lines.firstChild);
            my_lines.removeChild(elt);
-       })
-       console.log(all_categories);
-       console.log(my_selected_categories);
-       console.log(all_lines);
-       console.log(my_selected_lines);
+        })
 
-
-       if (document.querySelector('.dragndrop')) {
-/* ***************************** */
-/* * Beginning for drag-n-drop * */
-/* ***************************** */
-    const draggables = document.querySelectorAll('.list-item')
-    const containers = document.querySelectorAll('.list')
-
-    draggables.forEach(draggable => {
-      draggable.addEventListener('dragstart', () => {
-        draggable.classList.add('dragging')
-      })
-
-      draggable.addEventListener('dragend', () => {
-        draggable.classList.remove('dragging')
-      })
-    })
-
-    containers.forEach(container => {
-      container.addEventListener('dragover', e => {
-        e.preventDefault()
-        const afterElement = getDragAfterElement(container, e.clientY)
-        const draggable = document.querySelector('.dragging')
-        if (afterElement == null) {
-          container.appendChild(draggable)
-        } else {
-          container.insertBefore(draggable, afterElement)
-        }
-      })
-    })
-
-    function getDragAfterElement(container, y) {
-      const draggableElements = [...container.querySelectorAll('.list-item:not(.dragging)')]
-
-      return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect()
-        const offset = y - box.top - box.height / 2
-        if (offset < 0 && offset > closest.offset) {
-          return { offset: offset, element: child }
-        } else {
-          return closest
-        }
-      }, { offset: Number.NEGATIVE_INFINITY }).element
-    }
-/* *********************** */
-/* * End for drag-n-drop * */
-/* *********************** */
-}
-
-
-
-
-
-
+        // Reinit du dragndrop car le DOM a été modifié
+        dragndrop();
     });
 
     // submit the form --> Ajax
@@ -156,53 +151,10 @@ if ((document.getElementById('createchklst'))||(document.getElementById('updatec
 
     });
 }
-if (document.querySelector('.dragndrop')) {
-/* ***************************** */
-/* * Beginning for drag-n-drop * */
-/* ***************************** */
-    const draggables = document.querySelectorAll('.list-item')
-    const containers = document.querySelectorAll('.list')
 
-    draggables.forEach(draggable => {
-      draggable.addEventListener('dragstart', () => {
-        draggable.classList.add('dragging')
-      })
+// Initialisation du dragndrop
+dragndrop();
 
-      draggable.addEventListener('dragend', () => {
-        draggable.classList.remove('dragging')
-      })
-    })
-
-    containers.forEach(container => {
-      container.addEventListener('dragover', e => {
-        e.preventDefault()
-        const afterElement = getDragAfterElement(container, e.clientY)
-        const draggable = document.querySelector('.dragging')
-        if (afterElement == null) {
-          container.appendChild(draggable)
-        } else {
-          container.insertBefore(draggable, afterElement)
-        }
-      })
-    })
-
-    function getDragAfterElement(container, y) {
-      const draggableElements = [...container.querySelectorAll('.list-item:not(.dragging)')]
-
-      return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect()
-        const offset = y - box.top - box.height / 2
-        if (offset < 0 && offset > closest.offset) {
-          return { offset: offset, element: child }
-        } else {
-          return closest
-        }
-      }, { offset: Number.NEGATIVE_INFINITY }).element
-    }
-/* *********************** */
-/* * End for drag-n-drop * */
-/* *********************** */
-}
 /* *********************** */
 /* * Beginning Modal box * */
 /* *********************** */
